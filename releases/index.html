@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Releases &amp; downloads — Capnatix</title>
+  <meta name="description" content="Capnatix releases: Chrome extension and self-hosting downloads for every published version.">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="stylesheet" href="/assets/site.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="site-header">
+      <a class="brand" href="/">
+        <img class="logo-light" src="/assets/logo-light.png" width="73" height="28" alt="Capnatix">
+        <img class="logo-dark" src="/assets/logo-dark.png" width="79" height="28" alt="Capnatix">
+      </a>
+    </header>
+
+    <main>
+      <h1>Releases &amp; downloads</h1>
+      <p>
+        Every release below is version-matched: the
+        <code>docker-compose.prod.yaml</code> and <code>env.prod.example</code>
+        attached to a release are the ones that go with that release's
+        application images, and the Chrome extension attached to a release is
+        the one that release's backend links to.
+      </p>
+
+      <p id="releases-status" role="status" aria-live="polite" class="status-region">
+        Loading releases&hellip;
+      </p>
+
+      <ul class="release-list" id="releases-list"></ul>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; Capnatix.</p>
+    </footer>
+  </div>
+
+  <script src="/assets/releases.js"></script>
+</body>
+</html>
