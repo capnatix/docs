@@ -48,7 +48,8 @@ npm run preview    # serve the built dist/ locally
   INVOS-697 Plane ticket before adding to this file — its scope is
   deliberately narrow and each token override there documents the contrast
   ratio it preserves.
-- **`docs/decisions/`** — architecture decision records for this repo.
+- Design decisions for major changes to this repo are recorded in the
+  corresponding Plane ticket (e.g. INVOS-697), not committed to the repo.
 
 Stage 3 (per-feature help content, as Markdown under `src/content/docs/`)
 and stage 4 (API reference) are tracked separately (INVOS-697) and are not

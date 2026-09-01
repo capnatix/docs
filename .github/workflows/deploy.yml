@@ -7,9 +7,13 @@ on:
   workflow_dispatch: # manual re-deploy without an empty commit
 
 # Never cancel an in-flight Pages deployment — a cancelled deploy can leave
-# the site on a half-published artifact. Queue instead.
+# the site on a half-published artifact. Queue instead. Scoped per-ref so a
+# PR's build-only run (never reaches `deploy`) doesn't share a queue with
+# real deploys from other branches/PRs — while two rapid pushes to the SAME
+# ref (e.g. main) still queue against each other, which is what
+# cancel-in-progress: false is actually protecting.
 concurrency:
-  group: pages
+  group: pages-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -37,9 +41,14 @@ jobs:
 
   deploy:
     needs: build
-    # Keeps a PR from a fork from ever publishing to production — this is a
-    # security control, not a convenience.
-    if: github.event_name != 'pull_request'
+    # Keeps a PR from a fork from ever publishing to production, AND keeps a
+    # manual workflow_dispatch run against a feature/WIP branch from ever
+    # publishing to production — both are security controls, not a
+    # convenience. The push trigger only ever fires with github.ref ==
+    # refs/heads/main (its own `branches: [main]` filter), so this is purely
+    # closing the workflow_dispatch-from-any-branch gap without affecting
+    # the existing push-to-main path.
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     permissions:
       contents: read
       pages: write

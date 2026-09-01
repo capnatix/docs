@@ -62,11 +62,63 @@
 	   site.css's light --link: 5.45:1 against the --bg value above. */
 	--sl-color-accent: hsl(175, 74%, 26%); /* was site.css --link (light) */
 
-	/* --sl-color-accent-high backs secondary UI chrome in light mode
-	   (search outline, Badge.astro's dark variant) — sourced from site.css's
-	   light --focus-ring, which is a near-identical teal one shade darker.
-	   Not itself the text-accent surface, so not the ratio being preserved. */
-	--sl-color-accent-high: hsl(174, 72%, 30%); /* was site.css --focus-ring (light) */
+	/* --sl-color-accent-high AND --sl-color-accent-low are read by more than
+	   this file's own .badge/focus-ring — grepped the full installed
+	   @astrojs/starlight@0.41.11 package (components/, style/, user-components/)
+	   for every consumer of both tokens and recomputed contrast against each
+	   one's real pairing (values via node_modules/@astrojs/starlight):
+
+	   accent-high consumers:
+	   - style/props.css --sl-color-text-accent (dark only; light resolves to
+	     --sl-color-accent instead, a different token, out of scope here) —
+	     prose links, dark mode. Unchanged, still 10.40:1 (the ratio this
+	     ticket's decision record already documented and preserves).
+	   - style/props.css --sl-color-bg-accent (dark only) → components/Banner.astro's
+	     bg fallback, paired with --sl-color-text-invert (= accent-low, dark)
+	     as its text fallback: 6.06:1. Passes with margin.
+	   - user-components/Badge.astro's `.default` variant, LIGHT mode:
+	     --sl-badge-default-bg: var(--sl-color-accent-high), text hardcoded
+	     #fff. This was the failing case: 4.58:1 at the old light value
+	     (hsl(174,72%,30%), barely over the 4.5:1 AA floor). The value below
+	     is darkened (30%→25% lightness, same hue/saturation) specifically to
+	     fix this: 6.13:1 at the new value. Verified this doesn't touch either
+	     ratio this ticket's decision record already tuned for the
+	     release-card — dark accent-high-vs-bg (10.40:1) is a DIFFERENT
+	     property value (this file's dark :root block, untouched) and light
+	     accent-vs-bg (5.45:1) is a DIFFERENT token (--sl-color-accent, not
+	     -high, untouched) — so darkening this token doesn't regress either.
+	   - components/Search.astro: `outline: 1px solid var(--sl-color-accent-high)`
+	     on search-result hover/focus-within, and this file's own
+	     a:focus-visible/button:focus-visible ring below. Both decorative,
+	     non-text UI chrome (no WCAG text-contrast floor applies), same
+	     treatment as --sl-color-accent's non-text uses above.
+	   - style/print.css redefines accent-high itself with a hardcoded value
+	     inside `@media print`, not a var() read of this file's override — not
+	     actually a consumer of this token, excluded.
+
+	   accent-low consumers:
+	   - style/props.css --sl-color-text-invert (dark only; light resolves to
+	     --sl-color-black instead, out of scope here) → paired with
+	     --sl-color-text-accent (= accent-high, dark) as the bg in:
+	     user-components/FileTree.astro `.highlight`, components/SidebarSublist.astro
+	     `[aria-current='page']` (the sidebar's current-page highlight — the
+	     most frequently rendered of these), components/SkipLink.astro
+	     `a:focus`, and components/Banner.astro's text fallback (same pairing
+	     as the bg-accent case above). All four: 6.06:1. Passes with margin.
+	   - user-components/Badge.astro's `.default` variant, DARK mode: bg =
+	     accent-low, text hardcoded #fff: 11.34:1. Passes.
+	   - components/Search.astro: `background-color: var(--sl-color-accent-low)`
+	     on pagefind result hover/focus-within, text = --sl-color-white via
+	     `--pagefind-ui-text`. Dark: 11.34:1. Light: 16.24:1 (light accent-low
+	     is a pale tint, --sl-color-white(light) is near-black — high-contrast
+	     dark-on-light pairing regardless of this token's exact value).
+	     Both pass with large margin.
+	   - style/print.css: same as accent-high — hardcodes its own value under
+	     `@media print`, not a consumer of this override, excluded.
+
+	   Net: every consumer clears 4.5:1 once the light accent-high value below
+	   is darkened; nothing else needed changing. */
+	--sl-color-accent-high: hsl(174, 72%, 25%); /* was site.css --focus-ring (light) at 30% lightness; darkened to 25% for Badge.astro's default-variant text contrast (see above) */
 
 	/* Derived pale tint, same hue, for badge/hover-state backgrounds —
 	   mirrors Starlight's own light accent-low being a light background
