@@ -1,0 +1,27 @@
+---
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+---
+<StarlightPage
+	frontmatter={{
+		title: 'Releases & downloads',
+		description:
+			'Capnatix releases: Chrome extension and self-hosting downloads for every published version.',
+		tableOfContents: false,
+	}}
+>
+	<p>
+		Every release below is version-matched: the
+		<code>docker-compose.prod.yaml</code> and <code>env.prod.example</code>
+		attached to a release are the ones that go with that release's
+		application images, and the Chrome extension attached to a release is
+		the one that release's backend links to.
+	</p>
+
+	<p id="releases-status" role="status" aria-live="polite" class="status-region">
+		Loading releases&hellip;
+	</p>
+
+	<ul class="release-list" id="releases-list"></ul>
+
+	<script is:inline defer src="/assets/releases.js"></script>
+</StarlightPage>
