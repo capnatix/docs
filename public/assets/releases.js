@@ -55,8 +55,8 @@
   function assetLabel(name) {
     if (typeof name !== "string") return null;
     if (name.endsWith(".zip")) return "Chrome extension";
-    if (name.endsWith("docker-compose.prod.yaml")) return "docker-compose.prod.yaml";
-    if (name.endsWith("env.prod.example")) return "env.prod.example";
+    if (name.endsWith("docker-compose.prod.yaml")) return "docker-compose.yaml";
+    if (name.endsWith("env.prod.example")) return "env.example";
     return null;
   }
 
@@ -121,8 +121,14 @@
       li.appendChild(meta);
 
       var assets = Array.isArray(release.assets) ? release.assets : [];
-      var assetList = document.createElement("ul");
-      assetList.className = "asset-list";
+      var tagForAria = typeof release.tag_name === "string" ? release.tag_name : "this release";
+
+      // Recognized assets are grouped into two labeled sections —
+      // "Application" (docker-compose.prod.yaml, env.prod.example) and
+      // "Chrome Extension" (the .zip) — instead of one flat list, so each
+      // group's links wrap independently rather than mixing on one row.
+      var applicationAssets = [];
+      var extensionAssets = [];
 
       var shown = 0;
       for (var i = 0; i < assets.length && shown < 3; i++) {
@@ -131,18 +137,39 @@
         var url = asset && asset.browser_download_url;
         if (!label || !url) continue;
 
-        var assetLi = document.createElement("li");
-        var a = document.createElement("a");
-        a.href = url; // asset.browser_download_url used verbatim — never constructed
-        a.textContent = label;
-        a.setAttribute("aria-label", label + " for " + (typeof release.tag_name === "string" ? release.tag_name : "this release"));
-        assetLi.appendChild(a);
-        assetList.appendChild(assetLi);
+        if (label === "Chrome extension") {
+          extensionAssets.push({ label: label, url: url });
+        } else {
+          applicationAssets.push({ label: label, url: url });
+        }
         shown++;
       }
 
-      if (shown > 0) {
+      function appendAssetGroup(groupTitle, groupAssets) {
+        if (groupAssets.length === 0) return;
+
+        var groupLabel = document.createElement("p");
+        groupLabel.className = "asset-group-label";
+        groupLabel.textContent = groupTitle;
+        li.appendChild(groupLabel);
+
+        var assetList = document.createElement("ul");
+        assetList.className = "asset-list";
+        groupAssets.forEach(function (item) {
+          var assetLi = document.createElement("li");
+          var a = document.createElement("a");
+          a.href = item.url; // asset.browser_download_url used verbatim — never constructed
+          a.textContent = item.label;
+          a.setAttribute("aria-label", item.label + " for " + tagForAria);
+          assetLi.appendChild(a);
+          assetList.appendChild(assetLi);
+        });
         li.appendChild(assetList);
+      }
+
+      if (shown > 0) {
+        appendAssetGroup("Application", applicationAssets);
+        appendAssetGroup("Chrome Extension", extensionAssets);
       } else {
         var noAssets = document.createElement("p");
         noAssets.className = "meta";

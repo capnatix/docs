@@ -1,0 +1,62 @@
+name: Deploy docs site to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  pull_request: # build-only; catches a broken build before merge
+  workflow_dispatch: # manual re-deploy without an empty commit
+
+# Never cancel an in-flight Pages deployment — a cancelled deploy can leave
+# the site on a half-published artifact. Queue instead. Scoped per-ref so a
+# PR's build-only run (never reaches `deploy`) doesn't share a queue with
+# real deploys from other branches/PRs — while two rapid pushes to the SAME
+# ref (e.g. main) still queue against each other, which is what
+# cancel-in-progress: false is actually protecting.
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    # Only what npm ci / npm run build legitimately need — this job executes
+    # whatever the dependency tree's install/build scripts do, so it gets no
+    # more than read access to the repo, not the Pages-publishing scopes
+    # below.
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    # Keeps a PR from a fork from ever publishing to production, AND keeps a
+    # manual workflow_dispatch run against a feature/WIP branch from ever
+    # publishing to production — both are security controls, not a
+    # convenience. The push trigger only ever fires with github.ref ==
+    # refs/heads/main (its own `branches: [main]` filter), so this is purely
+    # closing the workflow_dispatch-from-any-branch gap without affecting
+    # the existing push-to-main path.
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

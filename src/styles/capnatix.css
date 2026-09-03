@@ -1,0 +1,297 @@
+/* Capnatix docs — Starlight theme overrides (INVOS-697, D3).
+   "Anchor the ramp" scope: override only the tokens that carry brand
+   identity plus the one lever for page background, then port the
+   release-card component rules (used by public/assets/releases.js — see
+   INVOS-640) with their var(--…) references re-pointed at the Starlight
+   equivalents. Do NOT add more tokens than this — Starlight's own
+   --sl-color-gray-1..7 ramp is left untouched.
+
+   Registered via `customCss` in astro.config.mjs, which Starlight injects
+   UNLAYERED (its own props.css sits in `@layer starlight.base`). Unlayered
+   beats layered regardless of specificity, so plain `:root { … }` wins here
+   with no `!important` and no specificity hacks — verified against the
+   installed @astrojs/starlight package, not assumed.
+
+   Starlight themes via the `data-theme` attribute an inline script stamps
+   on <html> (dark on bare :root, light on :root[data-theme='light']) — NOT
+   `prefers-color-scheme`. This file follows that selector structure, unlike
+   the old assets/site.css it replaces. */
+
+:root {
+	/* Dark is Starlight's default, on bare :root — same as its own props.css. */
+
+	/* --sl-color-black is the lever for --sl-color-bg (Starlight defines
+	   --sl-color-bg: var(--sl-color-black)). Set to the old site.css dark
+	   --bg value so the page background is byte-identical to the surface
+	   the ratios below were measured against. */
+	--sl-color-black: hsl(205, 45%, 5%); /* was site.css --bg (dark) */
+
+	/* --sl-color-accent-high drives --sl-color-text-accent in dark mode,
+	   which is what colors prose links (style/markdown.css). Sourced
+	   verbatim from site.css's dark --link: 10.40:1 against the --bg value
+	   above — carries over intact because the surface is now the same. */
+	--sl-color-accent-high: hsl(172, 66%, 50%); /* was site.css --link (dark) */
+
+	/* --sl-color-accent feeds secondary UI chrome (accent-color, search
+	   outline, borders, MobileTableOfContents) rather than a body-text
+	   surface with a documented ratio to preserve — same teal as above,
+	   matching site.css's own dark --link/--focus-ring (which are
+	   identical values there too). Not independently re-verified per
+	   surface; these are non-text UI accents, not paragraphs of copy. */
+	--sl-color-accent: hsl(172, 66%, 50%); /* was site.css --link/--focus-ring (dark) */
+
+	/* --sl-color-accent-low backs badge/hover-state chrome (Search.astro,
+	   Badge.astro) as a dark, desaturated tint sitting on the page
+	   background — site.css had no equivalent muted-dark teal to source, so
+	   this is a derived tint (same hue), not carried over from a measured
+	   ratio. It is also Starlight's own --sl-color-text-invert source in
+	   dark mode (props.css: `--sl-color-text-invert: var(--sl-color-accent-low)`),
+	   i.e. actual text color set on an accent-filled surface
+	   (--sl-color-bg-accent), not just decorative chrome — verified at
+	   6.06:1 there, which passes. */
+	--sl-color-accent-low: hsl(172, 40%, 18%);
+}
+
+/* Light is opt-in via the stamped attribute, and wins on specificity even
+   though this whole file is unlayered against unlayered. */
+:root[data-theme='light'] {
+	--sl-color-black: hsl(190, 30%, 98%); /* was site.css --bg (light) */
+
+	/* Light mode's --sl-color-text-accent resolves to --sl-color-accent
+	   directly (not accent-high) — see props.css. Sourced verbatim from
+	   site.css's light --link: 5.45:1 against the --bg value above. */
+	--sl-color-accent: hsl(175, 74%, 26%); /* was site.css --link (light) */
+
+	/* --sl-color-accent-high AND --sl-color-accent-low are read by more than
+	   this file's own .badge/focus-ring — grepped the full installed
+	   @astrojs/starlight@0.41.11 package (components/, style/, user-components/)
+	   for every consumer of both tokens and recomputed contrast against each
+	   one's real pairing (values via node_modules/@astrojs/starlight):
+
+	   accent-high consumers:
+	   - style/props.css --sl-color-text-accent (dark only; light resolves to
+	     --sl-color-accent instead, a different token, out of scope here) —
+	     prose links, dark mode. Unchanged, still 10.40:1 (the ratio this
+	     ticket's decision record already documented and preserves).
+	   - style/props.css --sl-color-bg-accent (dark only) → components/Banner.astro's
+	     bg fallback, paired with --sl-color-text-invert (= accent-low, dark)
+	     as its text fallback: 6.06:1. Passes with margin.
+	   - user-components/Badge.astro's `.default` variant, LIGHT mode:
+	     --sl-badge-default-bg: var(--sl-color-accent-high), text hardcoded
+	     #fff. This was the failing case: 4.58:1 at the old light value
+	     (hsl(174,72%,30%), barely over the 4.5:1 AA floor). The value below
+	     is darkened (30%→25% lightness, same hue/saturation) specifically to
+	     fix this: 6.13:1 at the new value. Verified this doesn't touch either
+	     ratio this ticket's decision record already tuned for the
+	     release-card — dark accent-high-vs-bg (10.40:1) is a DIFFERENT
+	     property value (this file's dark :root block, untouched) and light
+	     accent-vs-bg (5.45:1) is a DIFFERENT token (--sl-color-accent, not
+	     -high, untouched) — so darkening this token doesn't regress either.
+	   - components/Search.astro: `outline: 1px solid var(--sl-color-accent-high)`
+	     on search-result hover/focus-within, and this file's own
+	     a:focus-visible/button:focus-visible ring below. Both decorative,
+	     non-text UI chrome (no WCAG text-contrast floor applies), same
+	     treatment as --sl-color-accent's non-text uses above.
+	   - style/print.css redefines accent-high itself with a hardcoded value
+	     inside `@media print`, not a var() read of this file's override — not
+	     actually a consumer of this token, excluded.
+
+	   accent-low consumers:
+	   - style/props.css --sl-color-text-invert (dark only; light resolves to
+	     --sl-color-black instead, out of scope here) → paired with
+	     --sl-color-text-accent (= accent-high, dark) as the bg in:
+	     user-components/FileTree.astro `.highlight`, components/SidebarSublist.astro
+	     `[aria-current='page']` (the sidebar's current-page highlight — the
+	     most frequently rendered of these), components/SkipLink.astro
+	     `a:focus`, and components/Banner.astro's text fallback (same pairing
+	     as the bg-accent case above). All four: 6.06:1. Passes with margin.
+	   - user-components/Badge.astro's `.default` variant, DARK mode: bg =
+	     accent-low, text hardcoded #fff: 11.34:1. Passes.
+	   - components/Search.astro: `background-color: var(--sl-color-accent-low)`
+	     on pagefind result hover/focus-within, text = --sl-color-white via
+	     `--pagefind-ui-text`. Dark: 11.34:1. Light: 16.24:1 (light accent-low
+	     is a pale tint, --sl-color-white(light) is near-black — high-contrast
+	     dark-on-light pairing regardless of this token's exact value).
+	     Both pass with large margin.
+	   - style/print.css: same as accent-high — hardcodes its own value under
+	     `@media print`, not a consumer of this override, excluded.
+
+	   Net: every consumer clears 4.5:1 once the light accent-high value below
+	   is darkened; nothing else needed changing. */
+	--sl-color-accent-high: hsl(174, 72%, 25%); /* was site.css --focus-ring (light) at 30% lightness; darkened to 25% for Badge.astro's default-variant text contrast (see above) */
+
+	/* Derived pale tint, same hue, for badge/hover-state backgrounds —
+	   mirrors Starlight's own light accent-low being a light background
+	   tint. Not independently ratio-verified, same caveat as the dark
+	   accent-low above. */
+	--sl-color-accent-low: hsl(175, 60%, 94%);
+}
+
+/* Restores the branded focus ring the old assets/site.css carried site-wide
+   (`a:focus-visible, button:focus-visible { outline: 3px solid
+   var(--focus-ring); ... }`) — dropped when that file was deleted for this
+   port, with nothing put back in its place. Starlight's own build supplies
+   no generic focus-visible rule of its own (only one narrow
+   `.asset-list a:focus-visible` background swap, ported below), so every
+   other interactive control — sidebar links, search, theme toggle, this
+   file's own .retry-button — was left on the bare browser default outline.
+   --sl-color-accent-high carries the same values as the old --focus-ring
+   token in both themes (see its "was site.css --focus-ring" comments
+   above), so this is a straight token rename, not a new color choice.
+   Scoped globally, not just to the release-card elements this file
+   otherwise touches, so Starlight's own controls get the branded ring back
+   too rather than only the two elements this file already styles. */
+a:focus-visible,
+button:focus-visible {
+	outline: 3px solid var(--sl-color-accent-high);
+	outline-offset: 2px;
+	border-radius: 2px;
+}
+
+/* Release-card component rules (D1/D3) — used by public/assets/releases.js.
+   The class names below (.card, .badge, .meta, .asset-list, .retry-button,
+   .status-region, .release-list) are a contract with that script: renaming
+   or dropping one silently unstyles the Releases page while the build stays
+   green. Ported from the old assets/site.css with var(--…) references
+   re-pointed at the nearest Starlight equivalent. */
+
+.release-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.card {
+	border: 1px solid var(--sl-color-hairline);
+	background: var(--sl-color-bg-nav);
+	border-radius: 8px;
+	padding: 1.25rem 1.5rem;
+	margin-bottom: 1.25rem;
+}
+
+.card h2 {
+	margin: 0 0 0.25rem;
+	font-size: 1.1rem;
+}
+
+.card .meta {
+	font-size: 0.9rem;
+	/* --sl-color-gray-3 fails AA in dark mode here: 4.47:1 on
+	   --sl-color-bg-nav (--sl-color-gray-6), just under the 4.5:1 floor for
+	   this 0.9rem/normal-weight text. --sl-color-gray-2 gives 8.54:1 on the
+	   same dark surface. Light mode keeps gray-3 below (6.54:1 on
+	   --sl-color-bg-nav there, already passing) — this pairing was never one
+	   Starlight itself validates, since Starlight only ever puts gray-3 on
+	   the page background, a lighter surface than bg-nav. */
+	color: var(--sl-color-gray-2);
+	margin-bottom: 0.75rem;
+}
+
+:root[data-theme='light'] .card .meta {
+	color: var(--sl-color-gray-3);
+}
+
+.badge {
+	display: inline-block;
+	/* Amber pair kept as its own tokens, not part of the --sl-color-accent
+	   system — this is a solid fill/text pairing, so the ratios computed in
+	   the old site.css still hold regardless of page surface (D3). Dark
+	   default here; light override below. */
+	--badge-bg: hsl(38, 92%, 56%); /* website --amber-400 primitive (dark) */
+	--badge-text: hsl(205, 40%, 10%); /* neutral-900; white fails at 1.96:1 on this bg, neutral-900 gives 8.90:1 */
+	background: var(--badge-bg);
+	color: var(--badge-text);
+	font-size: 0.75rem;
+	font-weight: 600;
+	padding: 0.1rem 0.5rem;
+	border-radius: 999px;
+	margin-left: 0.5rem;
+	vertical-align: middle;
+}
+
+:root[data-theme='light'] .badge {
+	--badge-bg: hsl(32, 85%, 33%); /* website --amber-600 primitive (light) */
+	--badge-text: hsl(0, 0%, 100%); /* white; 5.47:1 on --badge-bg */
+}
+
+.asset-group-label {
+	/* Sub-heading above each grouped asset-list (Application / Chrome
+	   Extension) — reuses the same dark/light split as .card .meta for
+	   contrast consistency (see the AA note above), just tighter spacing
+	   since it sits directly above its own <ul>. */
+	font-size: 0.8rem;
+	font-weight: 600;
+	color: var(--sl-color-gray-2);
+	margin: 0.75rem 0 0.35rem;
+}
+
+:root[data-theme='light'] .asset-group-label {
+	color: var(--sl-color-gray-3);
+}
+
+.asset-list {
+	list-style: none;
+	margin: 0 0 0.5rem;
+	padding: 0;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+.asset-list:last-child {
+	margin-bottom: 0;
+}
+
+.asset-list li {
+	/* Starlight's own @layer starlight.content markdown.css sets
+	   `.sl-markdown-content li + li:not(:where(.not-content *))` to
+	   margin-top: 0.25rem (4px) — this page's content sits inside
+	   .sl-markdown-content, so every non-first <li> in this flex row
+	   inherited that margin. Under the row's default align-items:normal
+	   (stretch), that top margin ate into the item's stretched height,
+	   making the 2nd+ link in a group render 4px shorter and pushed down
+	   relative to its sibling — same font-size/line-height, different box.
+	   This rule is unlayered, so it beats the layered Starlight rule
+	   regardless of specificity/order; margin: 0 removes the asymmetry. */
+	margin: 0;
+}
+
+.asset-list a {
+	display: inline-block;
+	border: 1px solid var(--sl-color-hairline);
+	border-radius: 6px;
+	padding: 0.35rem 0.75rem;
+	text-decoration: none;
+	font-size: 0.9rem;
+}
+
+.asset-list a:hover,
+.asset-list a:focus-visible {
+	background: var(--sl-color-bg-inline-code);
+}
+
+.status-region {
+	color: var(--sl-color-gray-3);
+}
+
+.status-region a {
+	font-weight: 600;
+}
+
+.retry-button {
+	font: inherit;
+	font-weight: 600;
+	color: var(--sl-color-text-accent);
+	background: none;
+	border: none;
+	padding: 0;
+	cursor: pointer;
+	text-decoration: underline;
+}
+
+/* Matches Starlight's own prose-link hover convention
+   (style/markdown.css: `.sl-markdown-content a:hover { color:
+   var(--sl-color-white) }`) rather than inventing a new hover mechanism. */
+.retry-button:hover {
+	color: var(--sl-color-white);
+}
