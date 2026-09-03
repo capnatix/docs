@@ -214,13 +214,46 @@ button:focus-visible {
 	--badge-text: hsl(0, 0%, 100%); /* white; 5.47:1 on --badge-bg */
 }
 
+.asset-group-label {
+	/* Sub-heading above each grouped asset-list (Application / Chrome
+	   Extension) — reuses the same dark/light split as .card .meta for
+	   contrast consistency (see the AA note above), just tighter spacing
+	   since it sits directly above its own <ul>. */
+	font-size: 0.8rem;
+	font-weight: 600;
+	color: var(--sl-color-gray-2);
+	margin: 0.75rem 0 0.35rem;
+}
+
+:root[data-theme='light'] .asset-group-label {
+	color: var(--sl-color-gray-3);
+}
+
 .asset-list {
 	list-style: none;
-	margin: 0;
+	margin: 0 0 0.5rem;
 	padding: 0;
 	display: flex;
 	flex-wrap: wrap;
 	gap: 0.5rem;
+}
+
+.asset-list:last-child {
+	margin-bottom: 0;
+}
+
+.asset-list li {
+	/* Starlight's own @layer starlight.content markdown.css sets
+	   `.sl-markdown-content li + li:not(:where(.not-content *))` to
+	   margin-top: 0.25rem (4px) — this page's content sits inside
+	   .sl-markdown-content, so every non-first <li> in this flex row
+	   inherited that margin. Under the row's default align-items:normal
+	   (stretch), that top margin ate into the item's stretched height,
+	   making the 2nd+ link in a group render 4px shorter and pushed down
+	   relative to its sibling — same font-size/line-height, different box.
+	   This rule is unlayered, so it beats the layered Starlight rule
+	   regardless of specificity/order; margin: 0 removes the asymmetry. */
+	margin: 0;
 }
 
 .asset-list a {
