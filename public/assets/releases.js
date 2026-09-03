@@ -55,8 +55,8 @@
   function assetLabel(name) {
     if (typeof name !== "string") return null;
     if (name.endsWith(".zip")) return "Chrome extension";
-    if (name.endsWith("docker-compose.prod.yaml")) return "docker-compose.prod.yaml";
-    if (name.endsWith("env.prod.example")) return "env.prod.example";
+    if (name.endsWith("docker-compose.prod.yaml")) return "docker-compose.yaml";
+    if (name.endsWith("env.prod.example")) return "env.example";
     return null;
   }
 
