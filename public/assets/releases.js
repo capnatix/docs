@@ -54,6 +54,11 @@
 
   function assetLabel(name) {
     if (typeof name !== "string") return null;
+    // The stable, tag-less alias (INVOS-842) — same zip content as the
+    // versioned asset below, uploaded under this exact literal name so an
+    // external download link never has to change across releases. Checked
+    // before the generic .zip branch so the two don't collide on one label.
+    if (name === "capnatix-email-extension.zip") return "Chrome extension (latest)";
     if (name.endsWith(".zip")) return "Chrome extension";
     if (name.endsWith("docker-compose.prod.yaml")) return "docker-compose.yaml";
     if (name.endsWith("env.prod.example")) return "env.example";
@@ -130,14 +135,18 @@
       var applicationAssets = [];
       var extensionAssets = [];
 
+      // No cap on how many are shown — assetLabel() already filters to only
+      // the recognized asset types, so every one of them is meant to render.
+      // (A fixed "first N" cap here previously starved a real asset once a
+      // 4th recognized type existed — see INVOS-850.)
       var shown = 0;
-      for (var i = 0; i < assets.length && shown < 3; i++) {
+      for (var i = 0; i < assets.length; i++) {
         var asset = assets[i];
         var label = asset && assetLabel(asset.name);
         var url = asset && asset.browser_download_url;
         if (!label || !url) continue;
 
-        if (label === "Chrome extension") {
+        if (label.indexOf("Chrome extension") === 0) {
           extensionAssets.push({ label: label, url: url });
         } else {
           applicationAssets.push({ label: label, url: url });
