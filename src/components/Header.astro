@@ -6,6 +6,11 @@
 //   (which used to render it next to the page's own h1, now removed
 //   there in favor of the visible "Capnatix External API" heading
 //   Redoc's own spec already renders directly below it)
+// Also drops the stock social-icons slot and its divider entirely --
+// this site has no `social` entries configured (astro.config.mjs), so
+// <SocialIcons /> rendered nothing, but its divider line still drew on
+// its own, unconditionally, leaving a stray vertical tick with nothing
+// to its left.
 // Everything else here is copied verbatim from @astrojs/starlight/
 // components/Header.astro so the rest of the header keeps behaving
 // exactly like stock Starlight.
@@ -14,7 +19,6 @@ import config from 'virtual:starlight/user-config';
 import LanguageSelect from 'virtual:starlight/components/LanguageSelect';
 import Search from 'virtual:starlight/components/Search';
 import SiteTitle from 'virtual:starlight/components/SiteTitle';
-import SocialIcons from 'virtual:starlight/components/SocialIcons';
 import ThemeSelect from 'virtual:starlight/components/ThemeSelect';
 
 const shouldRenderSearch =
@@ -35,9 +39,6 @@ const isApiPage = Astro.url.pathname.replace(/\/+$/, '') === '/api';
 		{shouldRenderSearch && <Search />}
 	</div>
 	<div class="sl-hidden md:sl-flex print:hidden right-group">
-		<div class="sl-flex social-icons">
-			<SocialIcons />
-		</div>
 		<label class="api-docs-version" class:list={{ 'is-hidden': !isApiPage }}>
 			<span>Version</span>
 			<select id="api-explorer-version" />
@@ -97,15 +98,9 @@ const isApiPage = Astro.url.pathname.replace(/\/+$/, '') === '/api';
 			color: var(--sl-color-white);
 		}
 
-		.right-group,
-		.social-icons {
+		.right-group {
 			gap: 1rem;
 			align-items: center;
-		}
-		.social-icons::after {
-			content: '';
-			height: 2rem;
-			border-inline-end: 1px solid var(--sl-color-gray-5);
 		}
 
 		.api-docs-version {
