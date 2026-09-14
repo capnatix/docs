@@ -1,5 +1,5 @@
 ---
-title: 'Deal Sourcing (intake, sourcing, dealflow)'
+title: 'Deal Sourcing'
 ---
 
 Content for this page is coming soon.

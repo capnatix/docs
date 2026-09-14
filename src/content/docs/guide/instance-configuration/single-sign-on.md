@@ -1,5 +1,5 @@
 ---
-title: 'Single Sign On (Google/Microsoft)'
+title: 'Single Sign On'
 ---
 
 Content for this page is coming soon.

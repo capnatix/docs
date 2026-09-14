@@ -55,21 +55,6 @@ import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 </style>
 
 <style is:global>
-	/* Starlight's default content column (--sl-content-width: 45rem) is sized
-	   for prose, not for Redoc's three-panel layout -- widened to a value no
-	   realistic viewport reaches on this page only (hasSidebar={false} above
-	   already drops the left nav, so this is the other half of "full page
-	   for the iframe"). NOT `none`: Header.astro's grid-template-columns
-	   calc() subtracts this variable, and `none` isn't a valid calc()
-	   operand -- that makes the whole custom-property substitution
-	   guaranteed-invalid, which silently collapsed the header's grid back to
-	   its initial single-column layout at >=50rem. This file's own is:global
-	   styles only ever ship on /api (this page's own output), so there's no
-	   cross-page leak to guard against despite the global flag. */
-	:root {
-		--sl-content-width: 200rem;
-	}
-
 	/* Starlight's own page footer (edit-this-page / prev-next links) rendered
 	   below the iframe, adding height sizeFrame() never accounted for (it
 	   only measures the iframe's own top down to the viewport's bottom) --
@@ -85,9 +70,15 @@ import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 	   content below) still took up space from its own padding even with
 	   the h1 inside it reduced to sr-only (position: absolute, so it
 	   contributes no height itself -- the PANEL's padding is what
-	   remained). Collapsed outright instead of just hiding its content. */
+	   remained). Zeroed instead of display: none -- that would take the
+	   sr-only h1 out of the accessibility tree entirely (sr-only relies on
+	   staying in the tree, just visually clipped) and break the site's
+	   Skip-to-content link, whose target is this same h1's id="_top". With
+	   the panel's own padding at 0 and its only child position: absolute
+	   (out of normal flow), the panel still collapses to zero visual
+	   height on its own -- no display: none needed to get there. */
 	.content-panel:has(h1) {
-		display: none;
+		padding: 0;
 	}
 
 	/* ContentPanel's own padding and sl-container's max-width/auto
@@ -98,7 +89,17 @@ import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 	   panel { border-top: ... }` (a divider Starlight draws between the
 	   title panel and this one) still matched -- a CSS sibling combinator
 	   counts a display: none element as a sibling too, it isn't removed
-	   from the DOM, just not painted. */
+	   from the DOM, just not painted.
+
+	   max-width: none is the ONLY thing capping this column's width --
+	   an earlier attempt also pinned --sl-content-width to a large value
+	   on this page, on the theory that was the live constraint; it never
+	   was. hasSidebar={false} above makes Starlight apply its own
+	   `html:not([data-has-sidebar]) { --sl-content-width: 67.5rem }`,
+	   which wins over any page-level override of that same variable
+	   (confirmed via computed styles, not assumed) -- max-width: none
+	   here bypasses the variable entirely rather than trying to out-value
+	   it. */
 	.content-panel:not(:has(h1)) {
 		padding: 0;
 		border-top: none;
