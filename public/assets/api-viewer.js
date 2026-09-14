@@ -7,8 +7,22 @@
 (function () {
   "use strict";
 
-  var LIGHT_THEME = {};
+  // Redoc's own defaults (14px body text, Roboto/Montserrat) don't match
+  // Starlight's Docs pages (16px, the system font stack) -- shared between
+  // both themes below so the two tabs read as one site, not two.
+  var TYPOGRAPHY = {
+    fontSize: "16px",
+    fontFamily:
+      "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+    headings: {
+      fontFamily:
+        "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+    },
+  };
+
+  var LIGHT_THEME = { typography: TYPOGRAPHY };
   var DARK_THEME = {
+    typography: TYPOGRAPHY,
     colors: {
       primary: { main: "#4fd1c5" },
       text: { primary: "#e4e6e6", secondary: "#b7bfc3" },
