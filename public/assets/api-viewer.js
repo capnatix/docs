@@ -20,7 +20,29 @@
     },
   };
 
-  var LIGHT_THEME = { typography: TYPOGRAPHY };
+  // Redoc's own default active-item styling derives the highlighted
+  // group/leaf background from a darkened/lightened tint of the sidebar's
+  // OWN background color -- a plain gray/near-black block, not the site's
+  // teal accent Starlight's own sidebar uses for its active item. Colors
+  // below are copied from the live computed styles of a Docs page's own
+  // [aria-current="page"] sidebar link, in each theme, so "which item is
+  // selected" reads the same way in both tabs.
+  var DARK_ACTIVE = { background: "#2bd4bd", text: "#1c403b" };
+  var LIGHT_ACTIVE = { background: "#11736b", text: "#f8fbfb" };
+
+  function sidebarTheme(backgroundColor, textColor, active) {
+    return {
+      backgroundColor: backgroundColor,
+      textColor: textColor,
+      groupItems: { activeBackgroundColor: active.background, activeTextColor: active.text },
+      level1Items: { activeBackgroundColor: active.background, activeTextColor: active.text },
+    };
+  }
+
+  var LIGHT_THEME = {
+    typography: TYPOGRAPHY,
+    sidebar: sidebarTheme("#fafafa", "#333333", LIGHT_ACTIVE),
+  };
   var DARK_THEME = {
     typography: TYPOGRAPHY,
     colors: {
@@ -43,10 +65,7 @@
       },
       border: { dark: "#333", light: "#333" },
     },
-    sidebar: {
-      backgroundColor: "#0e161b",
-      textColor: "#e4e6e6",
-    },
+    sidebar: sidebarTheme("#0e161b", "#e4e6e6", DARK_ACTIVE),
     rightPanel: {
       backgroundColor: "#1b2b34",
       textColor: "#e4e6e6",
