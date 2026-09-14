@@ -1,0 +1,76 @@
+---
+// Overrides Starlight's default PageTitle to add the API Docs version
+// picker inline with the title, right-aligned, on /api only -- everywhere
+// else this renders identically to the stock component.
+//
+// PAGE_TITLE_ID isn't part of the package's public export map (only
+// '@astrojs/starlight/components/*' and a handful of others are) -- '_top'
+// is copied verbatim from its source (constants.ts) rather than imported.
+const PAGE_TITLE_ID = '_top';
+
+const isApiPage = Astro.url.pathname.replace(/\/+$/, '') === '/api';
+---
+
+<div class="page-title-row">
+	<h1 id={PAGE_TITLE_ID}>{Astro.locals.starlightRoute.entry.data.title}</h1>
+	{
+		isApiPage && (
+			<label class="api-docs-version">
+				<span>Version</span>
+				<select id="api-explorer-version" />
+			</label>
+		)
+	}
+</div>
+
+<style>
+	@layer starlight.core {
+		.page-title-row {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			justify-content: space-between;
+			column-gap: 1.5rem;
+		}
+		h1 {
+			margin-top: 1rem;
+			font-size: var(--sl-text-h1);
+			line-height: var(--sl-line-height-headings);
+			font-weight: 600;
+			color: var(--sl-color-white);
+		}
+	}
+
+	.api-docs-version {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-size: 0.8rem;
+		font-weight: 600;
+		color: var(--sl-color-gray-2);
+	}
+	.api-docs-version select {
+		appearance: none;
+		box-sizing: border-box;
+		height: 2.25rem;
+		line-height: 2.25rem;
+		font: inherit;
+		font-weight: 400;
+		font-size: 0.875rem;
+		padding: 0 1.75rem 0 0.6rem;
+		border: 1px solid var(--sl-color-gray-5);
+		border-radius: 0.25rem;
+		background-color: var(--sl-color-bg);
+		color: var(--sl-color-text);
+		min-width: 10rem;
+		background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+			linear-gradient(135deg, currentColor 50%, transparent 50%);
+		background-position:
+			calc(100% - 1.1rem) center,
+			calc(100% - 0.75rem) center;
+		background-size:
+			0.35rem 0.35rem,
+			0.35rem 0.35rem;
+		background-repeat: no-repeat;
+	}
+</style>
