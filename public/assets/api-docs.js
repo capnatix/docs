@@ -1,10 +1,23 @@
 /* Capnatix docs — API Docs (read-only reference).
  *
  * Lets a visitor pick a released version of the external API contract and
- * read it via Redoc. Specs are fetched same-origin from
- * /specs/<tag>/openapi.yaml — baked in at build time by
- * scripts/fetch-specs.mjs, since GitHub's release-asset download URLs send
- * no CORS headers and can't be fetched directly from this page's own JS.
+ * read it via Redoc, rendered inside its own <iframe> (api-viewer.astro) --
+ * not directly on this page. Redoc expects to fully own its document's
+ * window/scroll for its sidebar and scroll-spy to work reliably; embedded
+ * directly into this Starlight-framed page instead, its sidebar's active-
+ * item tracking (which item highlights, whether a click's target scrolls
+ * into view) became unreliable in a way no CSS/config fix resolved cleanly
+ * -- Starlight's own fixed header sits in the same document and offsets
+ * Redoc's assumptions about where the viewport's top edge actually is, and
+ * there's no reaching in to guarantee Redoc's own `scroll` listener is on
+ * the right element. A real, separate iframe document sidesteps the whole
+ * class of problem instead of chasing it further: inside it, Redoc's
+ * document IS the whole page, exactly what it's designed for.
+ *
+ * Specs are fetched same-origin from /specs/<tag>/openapi.yaml — baked in
+ * at build time by scripts/fetch-specs.mjs, since GitHub's release-asset
+ * download URLs send no CORS headers and can't be fetched directly from
+ * this page's own JS.
  *
  * Deliberately read-only, no "Try it out": that lives on a customer's own
  * instance instead, at /docs (Swagger UI, same-origin, gated behind the
@@ -16,49 +29,9 @@
 
   var versionSelect = document.getElementById("api-explorer-version");
   var statusEl = document.getElementById("api-explorer-status");
-  var container = document.getElementById("redoc-container");
+  var frame = document.getElementById("redoc-frame");
 
-  var LIGHT_THEME = {};
-  var DARK_THEME = {
-    colors: {
-      primary: { main: "#4fd1c5" },
-      text: { primary: "#e4e6e6", secondary: "#b7bfc3" },
-      http: {
-        get: "#4caf50",
-        post: "#3ece90",
-        put: "#fb8c00",
-        options: "#0d5aa7",
-        patch: "#e1a100",
-        delete: "#f93e3e",
-        basic: "#999",
-        link: "#31bbb6",
-        head: "#c167e4",
-      },
-      responses: {
-        success: { color: "#4caf50" },
-        error: { color: "#f93e3e" },
-      },
-      border: { dark: "#333", light: "#333" },
-    },
-    sidebar: {
-      backgroundColor: "#0e161b",
-      textColor: "#e4e6e6",
-    },
-    rightPanel: {
-      backgroundColor: "#1b2b34",
-      textColor: "#e4e6e6",
-    },
-  };
-
-  // Starlight sets `data-theme` more than once during a normal page load
-  // (an early FOUC-prevention script, then again when <starlight-theme-
-  // select> upgrades) with the SAME final value both times -- a
-  // MutationObserver fires on every attribute write, not just real value
-  // changes, so without this guard those two identical writes were enough
-  // to wipe and remount Redoc a second time moments after its first mount.
-  // A click landing in that window hit a component mid-teardown and
-  // silently did nothing; this is what that looked like as a bug report.
-  var lastAppliedTheme = null;
+  var lastRenderedKey = null;
 
   function setStatus(text) {
     if (statusEl) statusEl.textContent = text;
@@ -68,28 +41,15 @@
     return document.documentElement.dataset.theme === "light" ? "light" : "dark";
   }
 
-  function renderRedoc(specUrl) {
-    if (!window.Redoc) {
-      setStatus("Couldn't load the API reference's viewer.");
-      return;
-    }
-    lastAppliedTheme = currentTheme();
-    container.textContent = "";
-    window.Redoc.init(
-      specUrl,
-      {
-        theme: lastAppliedTheme === "light" ? LIGHT_THEME : DARK_THEME,
-        hideDownloadButton: false,
-        expandResponses: "200,201",
-      },
-      container
-    );
-  }
-
-  function onVersionChange() {
+  function renderFrame() {
     var tag = versionSelect.value;
     if (!tag) return;
-    renderRedoc("/specs/" + encodeURIComponent(tag) + "/openapi.yaml");
+    var theme = currentTheme();
+    var key = tag + ":" + theme;
+    if (key === lastRenderedKey) return;
+    lastRenderedKey = key;
+    var spec = "/specs/" + encodeURIComponent(tag) + "/openapi.yaml";
+    frame.src = "/api-viewer/?spec=" + encodeURIComponent(spec) + "&theme=" + theme;
   }
 
   function populateVersions(manifest) {
@@ -103,18 +63,20 @@
   }
 
   function init() {
-    // Redoc's theme is applied once at init, not reactively via CSS, so a
-    // real site theme change re-renders it rather than just flipping a
-    // class -- guarded by lastAppliedTheme above against the attribute
-    // being (re)written to the same value it already was.
+    // Starlight's theme <select> updates `data-theme` synchronously on a
+    // real change (and on system-preference changes, when set to "auto")
+    // -- reload the iframe with the matching theme. renderFrame's own key
+    // check absorbs the extra, same-value writes Starlight also makes
+    // during a normal page load (an early FOUC-prevention script, then
+    // again when the theme <select>'s custom element upgrades).
     new MutationObserver(function () {
-      if (versionSelect.value && currentTheme() !== lastAppliedTheme) onVersionChange();
+      if (versionSelect.value) renderFrame();
     }).observe(document.documentElement, {
       attributes: true,
       attributeFilter: ["data-theme"],
     });
 
-    versionSelect.addEventListener("change", onVersionChange);
+    versionSelect.addEventListener("change", renderFrame);
 
     setStatus("Loading available versions…");
     fetch("/specs/index.json")
@@ -129,7 +91,7 @@
         }
         setStatus("");
         populateVersions(manifest);
-        onVersionChange();
+        renderFrame();
       })
       .catch(function () {
         setStatus("Couldn't load the list of versions right now.");

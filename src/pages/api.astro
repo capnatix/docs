@@ -10,13 +10,13 @@ import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 >
 	<p id="api-explorer-status" role="status" aria-live="polite" class="status-region"></p>
 
-	<div id="redoc-container"></div>
+	{/* Redoc renders inside its own document here, not directly on this
+	   page -- see api-docs.js's own header comment for why (in short:
+	   Redoc expects to fully own its page's window/scroll, which sharing
+	   this one with Starlight's own fixed header and layout couldn't
+	   reliably give it). */}
+	<iframe id="redoc-frame" title="API Docs"></iframe>
 
-	{/* data-astro-rerun: Starlight's client-side routing may soft-navigate
-	   back to this page without a full reload, and a plain is:inline script
-	   isn't guaranteed to re-execute then -- this forces it to, so the
-	   dropdown/Redoc reliably come back to life every visit. */}
-	<script is:inline defer data-astro-rerun src="/vendor/redoc/redoc.standalone.js"></script>
 	<script is:inline defer data-astro-rerun src="/assets/api-docs.js"></script>
 </StarlightPage>
 
@@ -31,7 +31,6 @@ import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 	.status-region:empty {
 		display: none;
 	}
-
 </style>
 
 <style is:global>
@@ -44,14 +43,17 @@ import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 		--sl-content-width: 90rem;
 	}
 
-	/* Redoc's field-group labels ("Authorizations:", "Request Body
-	   schema:", "Response Schema:", ...) use a hardcoded near-black color
-	   (rgba(38, 50, 56, 0.7)) baked into their styled-component, not
-	   derived from the theme object passed to Redoc.init -- so it can't be
-	   fixed by DARK_THEME in api-docs.js, and goes near-invisible against
-	   our dark background. Overridden directly, dark mode only (fine as-is
-	   against a light background). */
-	:root:not([data-theme='light']) #redoc-container h5 {
-		color: rgba(228, 230, 230, 0.85);
+	/* Scoped (astro-hash-suffixed) selectors for this element were
+	   inexplicably not taking effect -- computed style kept resolving to
+	   the browser's bare default iframe size (300x150) despite the rule
+	   being present in the built output and matching the element. Global,
+	   unscoped, this applies reliably. */
+	#redoc-frame {
+		display: block;
+		width: 100%;
+		height: calc(100vh - var(--sl-nav-height, 3.5rem) - 5rem);
+		min-height: 48rem;
+		border: 1px solid var(--sl-color-gray-5);
+		border-radius: 0.5rem;
 	}
 </style>

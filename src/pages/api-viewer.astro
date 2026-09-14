@@ -1,0 +1,48 @@
+---
+// Bare, Starlight-free page that hosts Redoc directly -- loaded inside an
+// <iframe> by src/pages/api.astro, not visited on its own. Deliberately NOT
+// wrapped in StarlightPage: Redoc expects to own its whole document's
+// window/scroll (see api.astro's own header comment for the specifics that
+// broke when it was embedded directly in the Starlight-framed page instead
+// of a dedicated one), which a real, separate document guarantees in a way
+// no amount of CSS on a shared page can.
+//
+// Reads which spec/theme to render from its own query string (?spec=...
+// &theme=light|dark) rather than any inherited state, since as an iframe
+// it has no other channel to the parent page.
+---
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="robots" content="noindex" />
+		<title>API Docs</title>
+		<style>
+			html,
+			body {
+				margin: 0;
+				padding: 0;
+				height: 100%;
+			}
+			#redoc-container {
+				min-height: 100%;
+			}
+			/* Redoc's field-group labels ("Authorizations:", "Request Body
+			   schema:", "Response Schema:", ...) use a hardcoded near-black
+			   color (rgba(38, 50, 56, 0.7)) baked into their styled-
+			   component, not derived from the theme object passed to
+			   Redoc.init -- so it goes near-invisible against a dark
+			   background unless overridden directly. api-viewer.js adds
+			   .theme-dark to <html> when rendering the dark theme. */
+			.theme-dark #redoc-container h5 {
+				color: rgba(228, 230, 230, 0.85);
+			}
+		</style>
+	</head>
+	<body>
+		<div id="redoc-container"></div>
+		<script is:inline defer src="/vendor/redoc/redoc.standalone.js"></script>
+		<script is:inline defer src="/assets/api-viewer.js"></script>
+	</body>
+</html>
