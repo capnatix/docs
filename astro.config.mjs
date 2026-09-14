@@ -15,6 +15,14 @@ export default defineConfig({
         replacesTitle: true,
       },
       customCss: ['./src/styles/capnatix.css'],
+      components: {
+        // Adds a top-nav "API Docs" link, right before the theme toggle —
+        // see src/components/Header.astro's own header comment.
+        Header: './src/components/Header.astro',
+        // Adds the API Docs version picker inline with the page title, on
+        // /api only — see src/components/PageTitle.astro's own comment.
+        PageTitle: './src/components/PageTitle.astro',
+      },
       sidebar: [{ label: 'Releases & downloads', link: '/releases/' }],
       head: [
         // Starlight's own `favicon` option only emits the /favicon.svg link
