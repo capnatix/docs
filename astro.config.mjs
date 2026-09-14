@@ -16,8 +16,8 @@ export default defineConfig({
       },
       customCss: ['./src/styles/capnatix.css'],
       sidebar: [
-        { label: 'API Explorer', link: '/api/' },
         { label: 'Releases & downloads', link: '/releases/' },
+        { label: 'API Docs', link: '/api/' },
       ],
       head: [
         // Starlight's own `favicon` option only emits the /favicon.svg link
