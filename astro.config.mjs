@@ -49,7 +49,7 @@ export default defineConfig({
                 { label: 'Branding', link: '/guide/instance-configuration/branding/' },
                 { label: 'SMTP', link: '/guide/instance-configuration/smtp/' },
                 {
-                  label: 'Single Sign On (Google/Microsoft)',
+                  label: 'Single Sign On',
                   link: '/guide/instance-configuration/single-sign-on/',
                 },
               ],
@@ -83,7 +83,7 @@ export default defineConfig({
               label: 'Fund Operations',
               items: [
                 {
-                  label: 'Deal Sourcing (intake, sourcing, dealflow)',
+                  label: 'Deal Sourcing',
                   link: '/guide/fund-operations/deal-sourcing/',
                 },
                 { label: 'Portfolio', link: '/guide/fund-operations/portfolio/' },
