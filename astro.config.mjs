@@ -21,7 +21,7 @@ export default defineConfig({
       },
       customCss: ['./src/styles/capnatix.css'],
       components: {
-        // Adds a top-nav "API Docs" link, right before the theme toggle —
+        // Adds a top-nav Docs/API tab switcher, right after the site title —
         // see src/components/Header.astro's own header comment.
         Header: './src/components/Header.astro',
         // Adds the API Docs version picker inline with the page title, on

@@ -50,13 +50,18 @@ import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 
 <style is:global>
 	/* Starlight's default content column (--sl-content-width: 45rem) is sized
-	   for prose, not for Redoc's three-panel layout -- removed on this page
-	   only (hasSidebar={false} above already drops the left nav, so this is
-	   the other half of "full page for the iframe"). This file's own
-	   is:global styles only ever ship on /api (this page's own output), so
-	   there's no cross-page leak to guard against despite the global flag. */
+	   for prose, not for Redoc's three-panel layout -- widened to a value no
+	   realistic viewport reaches on this page only (hasSidebar={false} above
+	   already drops the left nav, so this is the other half of "full page
+	   for the iframe"). NOT `none`: Header.astro's grid-template-columns
+	   calc() subtracts this variable, and `none` isn't a valid calc()
+	   operand -- that makes the whole custom-property substitution
+	   guaranteed-invalid, which silently collapsed the header's grid back to
+	   its initial single-column layout at >=50rem. This file's own is:global
+	   styles only ever ship on /api (this page's own output), so there's no
+	   cross-page leak to guard against despite the global flag. */
 	:root {
-		--sl-content-width: none;
+		--sl-content-width: 200rem;
 	}
 
 	/* Starlight's own page footer (edit-this-page / prev-next links) rendered
