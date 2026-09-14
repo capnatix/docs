@@ -9,21 +9,13 @@ import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 		tableOfContents: false,
 	}}
 >
-	<p>
-		This is the same interactive documentation your own instance serves at
-		<code>/docs</code> when its external API is enabled — hosted here so you
-		can browse any released version's contract without turning that on
-		yourself. Pick a version, then enter your instance's own URL below to
-		send real requests to it with "Try it out".
-	</p>
-
 	<div class="api-explorer-controls" id="api-explorer-controls">
 		<label for="api-explorer-version">
-			Version
+			<span>Version</span>
 			<select id="api-explorer-version"></select>
 		</label>
 		<label for="api-explorer-instance-url">
-			Your instance URL
+			<span>Instance URL</span>
 			<input
 				id="api-explorer-instance-url"
 				type="url"
@@ -33,41 +25,120 @@ import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 				spellcheck="false"
 			/>
 		</label>
+		<p id="api-explorer-status" role="status" aria-live="polite" class="status-region"></p>
 	</div>
-
-	<p id="api-explorer-status" role="status" aria-live="polite" class="status-region"></p>
 
 	<div id="swagger-ui"></div>
 
 	<link rel="stylesheet" href="/vendor/swagger-ui/swagger-ui.css" />
-	<script is:inline defer src="/vendor/swagger-ui/swagger-ui-bundle.js"></script>
-	<script is:inline defer src="/vendor/swagger-ui/swagger-ui-standalone-preset.js"></script>
-	<script is:inline defer src="/assets/api-explorer.js"></script>
+	{/* data-astro-rerun: Starlight's client-side routing may soft-navigate
+	   back to this page without a full reload, and a plain is:inline script
+	   isn't guaranteed to re-execute then -- this forces it to, so the
+	   dropdown/Swagger UI reliably come back to life every visit. */}
+	<script is:inline defer data-astro-rerun src="/vendor/swagger-ui/swagger-ui-bundle.js"></script>
+	<script is:inline defer data-astro-rerun src="/vendor/swagger-ui/swagger-ui-standalone-preset.js"></script>
+	<script is:inline defer data-astro-rerun src="/assets/api-explorer.js"></script>
 </StarlightPage>
 
 <style>
 	.api-explorer-controls {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 1.5rem;
-		margin-block: 1.5rem;
+		align-items: center;
+		column-gap: 2rem;
+		row-gap: 0.5rem;
+		padding-block: 0.75rem;
+		margin-block-end: 1.5rem;
+		/* Bottom border only -- Starlight's own page-header rule under "API
+		   Docs" already draws the line above this row; a top border here
+		   just doubled it. */
+		border-block-end: 1px solid var(--sl-color-gray-5);
 	}
 	.api-explorer-controls label {
 		display: flex;
-		flex-direction: column;
-		gap: 0.25rem;
-		font-size: 0.875rem;
+		align-items: center;
+		gap: 0.5rem;
+		font-size: 0.8rem;
 		font-weight: 600;
-		flex: 1 1 16rem;
+		color: var(--sl-color-gray-2);
 	}
 	.api-explorer-controls select,
 	.api-explorer-controls input {
+		/* appearance: none strips the browser's own vertical metrics for
+		   <select> (Chrome/macOS in particular renders it a couple of px
+		   taller than a same-height <input> otherwise, despite the explicit
+		   height below) so the two controls line up exactly. */
+		appearance: none;
+		box-sizing: border-box;
+		height: 2.25rem;
+		line-height: 2.25rem;
 		font: inherit;
 		font-weight: 400;
-		padding: 0.5rem 0.65rem;
+		font-size: 0.875rem;
+		padding: 0 0.6rem;
 		border: 1px solid var(--sl-color-gray-5);
 		border-radius: 0.25rem;
 		background: var(--sl-color-bg);
 		color: var(--sl-color-text);
+		min-width: 14rem;
+	}
+	.api-explorer-controls select {
+		/* Restore a dropdown affordance now that appearance: none removed
+		   the native arrow. */
+		background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+			linear-gradient(135deg, currentColor 50%, transparent 50%);
+		background-position:
+			calc(100% - 1.1rem) center,
+			calc(100% - 0.75rem) center;
+		background-size:
+			0.35rem 0.35rem,
+			0.35rem 0.35rem;
+		background-repeat: no-repeat;
+		color: var(--sl-color-text);
+		padding-inline-end: 1.75rem;
+	}
+	.api-explorer-controls .status-region {
+		flex-basis: 100%;
+		margin: 0;
+		font-size: 0.8rem;
+		font-weight: 400;
+		color: var(--sl-color-gray-3);
+		min-height: 1.1em;
+	}
+
+	#swagger-ui {
+		border-radius: 0.5rem;
+		overflow: hidden;
+	}
+</style>
+
+<style is:global>
+	/* Starlight's default content column (--sl-content-width: 45rem) is sized
+	   for prose, not for Swagger UI's dense operation/schema tables -- widen
+	   it on this page only. This file's own is:global styles only ever ship
+	   on /api (this page's own output), so there's no cross-page leak to
+	   guard against despite the global flag. */
+	:root {
+		--sl-content-width: 80rem;
+	}
+
+	/* swagger-ui.css ships its own complete light/dark theme, switched by an
+	   `html.dark-mode` class -- NOT by our site's own `data-theme` attribute.
+	   api-explorer.js keeps that class in sync with Starlight's theme
+	   instead of fighting swagger-ui.css's rules with overrides, which is
+	   what caused near-invisible text before (forcing a white background
+	   while its OWN dark-mode CSS -- auto-armed by the visitor's OS color
+	   scheme on mount, independently of our site's theme -- still applied
+	   light-gray text meant for a dark background).
+
+	   Swagger UI's own dark-mode toggle lived in its topbar, so hiding the
+	   whole topbar below also removes it -- it would otherwise fight the
+	   same class from the other direction. */
+
+	/* Swagger UI's topbar is its own "load this spec URL" address bar --
+	   redundant and confusing here since our Version dropdown already
+	   drives which spec is loaded. */
+	.swagger-ui .topbar {
+		display: none;
 	}
 </style>

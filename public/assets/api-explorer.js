@@ -10,6 +10,14 @@
  * which Swagger UI resolves against THIS page's origin by default. A
  * requestInterceptor rewrites that origin to the visitor's own instance URL
  * at request time — no need to edit or re-fetch the spec per instance.
+ *
+ * Dark mode: swagger-ui.css ships its own complete light/dark theme, keyed
+ * off an `html.dark-mode` class rather than our site's `data-theme`
+ * attribute, and its bundle auto-arms that class from the visitor's OS
+ * color scheme on mount -- independently of whatever theme our own site is
+ * showing. syncDarkMode() below keeps the two in sync instead; the
+ * lightbulb toggle Swagger UI would otherwise render for this is hidden in
+ * api.astro's CSS so there's only one theme control on the page.
  */
 (function () {
   "use strict";
@@ -21,17 +29,28 @@
   var statusEl = document.getElementById("api-explorer-status");
 
   var currentInstanceUrl = "";
+  var versionGeneration = 0;
 
   function setStatus(text) {
     if (statusEl) statusEl.textContent = text;
+  }
+
+  function syncDarkMode() {
+    var dark = document.documentElement.dataset.theme !== "light";
+    document.documentElement.classList.toggle("dark-mode", dark);
   }
 
   function normalizeInstanceUrl(raw) {
     var trimmed = (raw || "").trim().replace(/\/+$/, "");
     if (!trimmed) return "";
     try {
-      // Throws on anything that isn't a real absolute URL.
+      // Throws on anything that isn't a real absolute URL -- but doesn't
+      // throw on a bare "host:port" like "localhost:3001" (a very plausible
+      // thing to type here): WHATWG parses "localhost" as the scheme and
+      // returns origin "null", which would otherwise sail through as if it
+      // were valid. Requiring http(s) rejects that case explicitly instead.
       var parsed = new URL(trimmed);
+      if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return "";
       return parsed.origin;
     } catch (e) {
       return "";
@@ -54,7 +73,7 @@
     }
   }
 
-  function initSwaggerUi(specUrl) {
+  function initSwaggerUi(specUrl, generation) {
     if (!window.SwaggerUIBundle) {
       setStatus("Couldn't load the API explorer's UI bundle.");
       return;
@@ -76,15 +95,27 @@
         }
         return req;
       },
+      onComplete: function () {
+        // Two versions picked in quick succession each fetch/render
+        // independently, so the SLOWER one can finish and overwrite the
+        // DOM after the version the dropdown now actually shows. If a
+        // newer selection was made while this one was still loading,
+        // re-render the current selection on top rather than leave a
+        // stale spec visible.
+        if (generation !== versionGeneration) onVersionChange();
+      },
     });
   }
 
   function onVersionChange() {
     var tag = versionSelect.value;
     if (!tag) return;
-    setStatus("Loading " + tag + "…");
-    initSwaggerUi("/specs/" + encodeURIComponent(tag) + "/openapi.yaml");
-    setStatus("Showing " + tag + ".");
+    versionGeneration++;
+    initSwaggerUi("/specs/" + encodeURIComponent(tag) + "/openapi.yaml", versionGeneration);
+    // Swagger UI's own mount can re-arm its dark-mode class from the
+    // visitor's OS color scheme regardless of our own site theme -- correct
+    // it right after mounting, not just on our own theme-change listener.
+    syncDarkMode();
   }
 
   function onInstanceUrlInput() {
@@ -111,6 +142,16 @@
   }
 
   function init() {
+    syncDarkMode();
+    // Starlight's theme select updates `data-theme` synchronously on
+    // change (and system-preference changes, when the visitor is on
+    // "auto") -- mirror every change onto Swagger UI's own class straight
+    // away rather than polling.
+    new MutationObserver(syncDarkMode).observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    });
+
     var storedUrl = loadStoredInstanceUrl();
     if (storedUrl) {
       instanceInput.value = storedUrl;
@@ -132,6 +173,11 @@
         }
         populateVersions(manifest);
         onVersionChange();
+        // The dropdown already shows which version is selected -- clear the
+        // "Loading…" text rather than replace it with a redundant "Showing
+        // vX." Reuses onInstanceUrlInput's own logic so a stored/entered
+        // instance URL's status (or the prompt to enter one) shows instead.
+        onInstanceUrlInput();
       })
       .catch(function () {
         setStatus("Couldn't load the list of versions right now.");
