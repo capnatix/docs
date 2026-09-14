@@ -7,6 +7,7 @@ import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 		description: 'Reference for the Capnatix external API — pick a released version to browse its contract.',
 		tableOfContents: false,
 	}}
+	hasSidebar={false}
 >
 	<p id="api-explorer-status" role="status" aria-live="polite" class="status-region"></p>
 
@@ -49,12 +50,13 @@ import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 
 <style is:global>
 	/* Starlight's default content column (--sl-content-width: 45rem) is sized
-	   for prose, not for Redoc's three-panel layout -- widen it on this page
-	   only. This file's own is:global styles only ever ship on /api (this
-	   page's own output), so there's no cross-page leak to guard against
-	   despite the global flag. */
+	   for prose, not for Redoc's three-panel layout -- removed on this page
+	   only (hasSidebar={false} above already drops the left nav, so this is
+	   the other half of "full page for the iframe"). This file's own
+	   is:global styles only ever ship on /api (this page's own output), so
+	   there's no cross-page leak to guard against despite the global flag. */
 	:root {
-		--sl-content-width: 90rem;
+		--sl-content-width: none;
 	}
 
 	/* Starlight's own page footer (edit-this-page / prev-next links) rendered

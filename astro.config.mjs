@@ -5,6 +5,11 @@ import starlight from '@astrojs/starlight';
 // docs.capnatix.com is a custom domain served at the root — no `base`.
 export default defineConfig({
   site: 'https://docs.capnatix.com',
+  // Skips the old marketing-style splash landing page -- straight into the
+  // docs tree instead, matching the Docs/API tabbed shell.
+  redirects: {
+    '/': '/getting-started/installation/',
+  },
   integrations: [
     starlight({
       title: 'Capnatix Docs',
@@ -23,7 +28,87 @@ export default defineConfig({
         // /api only — see src/components/PageTitle.astro's own comment.
         PageTitle: './src/components/PageTitle.astro',
       },
-      sidebar: [{ label: 'Releases & downloads', link: '/releases/' }],
+      sidebar: [
+        {
+          label: 'Getting Started',
+          items: [
+            { label: 'Installation', link: '/getting-started/installation/' },
+            { label: 'Configuration', link: '/getting-started/configuration/' },
+            { label: 'First User Setup', link: '/getting-started/first-user-setup/' },
+          ],
+        },
+        { label: 'Releases & downloads', link: '/releases/' },
+        {
+          label: 'Guide',
+          items: [
+            {
+              label: 'Instance Configuration',
+              items: [
+                { label: 'License Setup', link: '/guide/instance-configuration/license-setup/' },
+                { label: 'Fund Setup', link: '/guide/instance-configuration/fund-setup/' },
+                { label: 'Branding', link: '/guide/instance-configuration/branding/' },
+                { label: 'SMTP', link: '/guide/instance-configuration/smtp/' },
+                {
+                  label: 'Single Sign On (Google/Microsoft)',
+                  link: '/guide/instance-configuration/single-sign-on/',
+                },
+              ],
+            },
+            {
+              label: 'Global Setting',
+              items: [{ label: 'Managed List', link: '/guide/global-setting/managed-list/' }],
+            },
+            {
+              label: 'User Management',
+              items: [
+                {
+                  label: 'Master',
+                  items: [
+                    { label: 'Roles', link: '/guide/user-management/master/roles/' },
+                    { label: 'Users', link: '/guide/user-management/master/users/' },
+                  ],
+                },
+                {
+                  label: 'Fund',
+                  items: [
+                    {
+                      label: 'User Role Mapping',
+                      link: '/guide/user-management/fund/user-role-mapping/',
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              label: 'Fund Operations',
+              items: [
+                {
+                  label: 'Deal Sourcing (intake, sourcing, dealflow)',
+                  link: '/guide/fund-operations/deal-sourcing/',
+                },
+                { label: 'Portfolio', link: '/guide/fund-operations/portfolio/' },
+                { label: 'IC Meetings', link: '/guide/fund-operations/ic-meetings/' },
+                {
+                  label: 'Investor Management',
+                  link: '/guide/fund-operations/investor-management/',
+                },
+                { label: 'Reports', link: '/guide/fund-operations/reports/' },
+              ],
+            },
+            {
+              label: 'Fund Configuration',
+              items: [
+                { label: 'Fund Stages', link: '/guide/fund-configuration/fund-stages/' },
+                { label: 'Deal Cards', link: '/guide/fund-configuration/deal-cards/' },
+                { label: 'Application Form', link: '/guide/fund-configuration/application-form/' },
+              ],
+            },
+          ],
+        },
+        { label: 'Chrome Extension', link: '/chrome-extension/' },
+        { label: 'FAQs', link: '/faqs/' },
+        { label: 'Support', link: '/support/' },
+      ],
       head: [
         // Starlight's own `favicon` option only emits the /favicon.svg link
         // tag. The .ico fallback and apple-touch-icon existed before this

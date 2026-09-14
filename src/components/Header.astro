@@ -1,6 +1,6 @@
 ---
-// Overrides Starlight's default Header to add a top-nav link to /api/,
-// placed right before the theme toggle -- everything else here is copied
+// Overrides Starlight's default Header to add a top-nav Docs/API tab
+// switcher, right after the site title -- everything else here is copied
 // verbatim from @astrojs/starlight/components/Header.astro so the rest of
 // the header keeps behaving exactly like stock Starlight.
 import config from 'virtual:starlight/user-config';
@@ -21,6 +21,10 @@ const isApiPage = Astro.url.pathname.replace(/\/+$/, '') === '/api';
 	<div class="title-wrapper sl-flex">
 		<SiteTitle />
 	</div>
+	<nav class="tab-switcher" aria-label="Section">
+		<a href="/" aria-current={isApiPage ? undefined : 'page'}>Docs</a>
+		<a href="/api/" aria-current={isApiPage ? 'page' : undefined}>API</a>
+	</nav>
 	<div class="sl-flex print:hidden">
 		{shouldRenderSearch && <Search />}
 	</div>
@@ -28,7 +32,6 @@ const isApiPage = Astro.url.pathname.replace(/\/+$/, '') === '/api';
 		<div class="sl-flex social-icons">
 			<SocialIcons />
 		</div>
-		<a href="/api/" class="api-docs-link" aria-current={isApiPage ? 'page' : undefined}>API Docs</a>
 		<ThemeSelect />
 		<LanguageSelect />
 	</div>
@@ -51,6 +54,31 @@ const isApiPage = Astro.url.pathname.replace(/\/+$/, '') === '/api';
 			min-width: 0;
 		}
 
+		.tab-switcher {
+			display: flex;
+			gap: 0.25rem;
+			padding: 0.2rem;
+			border: 1px solid var(--sl-color-gray-5);
+			border-radius: 999px;
+			flex-shrink: 0;
+		}
+		.tab-switcher a {
+			padding: 0.3rem 0.9rem;
+			border-radius: 999px;
+			font-size: var(--sl-text-sm);
+			font-weight: 600;
+			color: var(--sl-color-gray-2);
+			text-decoration: none;
+			white-space: nowrap;
+		}
+		.tab-switcher a:hover {
+			color: var(--sl-color-white);
+		}
+		.tab-switcher a[aria-current='page'] {
+			background: var(--sl-color-gray-6);
+			color: var(--sl-color-white);
+		}
+
 		.right-group,
 		.social-icons {
 			gap: 1rem;
@@ -60,20 +88,6 @@ const isApiPage = Astro.url.pathname.replace(/\/+$/, '') === '/api';
 			content: '';
 			height: 2rem;
 			border-inline-end: 1px solid var(--sl-color-gray-5);
-		}
-
-		.api-docs-link {
-			font-size: var(--sl-text-sm);
-			font-weight: 600;
-			color: var(--sl-color-gray-2);
-			text-decoration: none;
-			white-space: nowrap;
-		}
-		.api-docs-link:hover {
-			color: var(--sl-color-white);
-		}
-		.api-docs-link[aria-current='page'] {
-			color: var(--sl-color-text-accent);
 		}
 
 		@media (min-width: 50rem) {
@@ -98,6 +112,7 @@ const isApiPage = Astro.url.pathname.replace(/\/+$/, '') === '/api';
 						calc(var(--__sidebar-width) + max(0rem, var(--__main-column-fr) - var(--sl-nav-gap))),
 						auto
 					)
+					auto
 					1fr
 					auto;
 				align-content: center;
