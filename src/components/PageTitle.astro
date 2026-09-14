@@ -1,9 +1,15 @@
 ---
-// Overrides Starlight's default PageTitle to add the API Docs version
-// picker inline with the title, right-aligned, on /api only, and to size
-// every page's title down to h3 with no top margin site-wide (paired with
-// capnatix.css's own .content-panel:has(h1) rule, tightening the vertical
-// space around it the same way, on every page).
+// Overrides Starlight's default PageTitle to:
+// - size every page's title down to h3 with no top margin site-wide
+//   (paired with capnatix.css's own .content-panel:has(h1) rule, which
+//   tightens the vertical space around it the same way, on every page)
+// - skip the visible title entirely on /api: Redoc's own spec renders
+//   "Capnatix External API" as its own heading right below, so a second,
+//   redundant "API Docs" heading above it added nothing. An sr-only h1
+//   is kept so the page still has the one visible-or-not top-level
+//   heading assistive tech expects. The version picker that used to sit
+//   next to this title now lives in the top nav instead (Header.astro,
+//   same /api-only visibility).
 //
 // PAGE_TITLE_ID isn't part of the package's public export map (only
 // '@astrojs/starlight/components/*' and a handful of others are) -- '_top'
@@ -13,27 +19,12 @@ const PAGE_TITLE_ID = '_top';
 const isApiPage = Astro.url.pathname.replace(/\/+$/, '') === '/api';
 ---
 
-<div class="page-title-row">
-	<h1 id={PAGE_TITLE_ID}>{Astro.locals.starlightRoute.entry.data.title}</h1>
-	{
-		isApiPage && (
-			<label class="api-docs-version">
-				<span>Version</span>
-				<select id="api-explorer-version" />
-			</label>
-		)
-	}
-</div>
+<h1 id={PAGE_TITLE_ID} class:list={{ 'sr-only': isApiPage }}>
+	{Astro.locals.starlightRoute.entry.data.title}
+</h1>
 
 <style>
 	@layer starlight.core {
-		.page-title-row {
-			display: flex;
-			flex-wrap: wrap;
-			align-items: center;
-			justify-content: space-between;
-			column-gap: 1.5rem;
-		}
 		h1 {
 			margin-top: 0;
 			font-size: var(--sl-text-h3);
@@ -43,36 +34,15 @@ const isApiPage = Astro.url.pathname.replace(/\/+$/, '') === '/api';
 		}
 	}
 
-	.api-docs-version {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		font-size: 0.8rem;
-		font-weight: 600;
-		color: var(--sl-color-gray-2);
-	}
-	.api-docs-version select {
-		appearance: none;
-		box-sizing: border-box;
-		height: 2.25rem;
-		line-height: 2.25rem;
-		font: inherit;
-		font-weight: 400;
-		font-size: 0.875rem;
-		padding: 0 1.75rem 0 0.6rem;
-		border: 1px solid var(--sl-color-gray-5);
-		border-radius: 0.25rem;
-		background-color: var(--sl-color-bg);
-		color: var(--sl-color-text);
-		min-width: 10rem;
-		background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
-			linear-gradient(135deg, currentColor 50%, transparent 50%);
-		background-position:
-			calc(100% - 1.1rem) center,
-			calc(100% - 0.75rem) center;
-		background-size:
-			0.35rem 0.35rem,
-			0.35rem 0.35rem;
-		background-repeat: no-repeat;
+	.sr-only {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		margin: -1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		white-space: nowrap;
+		border: 0;
 	}
 </style>
