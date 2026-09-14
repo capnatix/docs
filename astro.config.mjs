@@ -15,7 +15,10 @@ export default defineConfig({
         replacesTitle: true,
       },
       customCss: ['./src/styles/capnatix.css'],
-      sidebar: [{ label: 'Releases & downloads', link: '/releases/' }],
+      sidebar: [
+        { label: 'API Explorer', link: '/api/' },
+        { label: 'Releases & downloads', link: '/releases/' },
+      ],
       head: [
         // Starlight's own `favicon` option only emits the /favicon.svg link
         // tag. The .ico fallback and apple-touch-icon existed before this

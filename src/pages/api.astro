@@ -1,0 +1,73 @@
+---
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+---
+<StarlightPage
+	frontmatter={{
+		title: 'API Explorer',
+		description:
+			'Browse the Capnatix external API contract and try it out against your own self-hosted instance.',
+		tableOfContents: false,
+	}}
+>
+	<p>
+		This is the same interactive documentation your own instance serves at
+		<code>/docs</code> when its external API is enabled — hosted here so you
+		can browse any released version's contract without turning that on
+		yourself. Pick a version, then enter your instance's own URL below to
+		send real requests to it with "Try it out".
+	</p>
+
+	<div class="api-explorer-controls" id="api-explorer-controls">
+		<label for="api-explorer-version">
+			Version
+			<select id="api-explorer-version"></select>
+		</label>
+		<label for="api-explorer-instance-url">
+			Your instance URL
+			<input
+				id="api-explorer-instance-url"
+				type="url"
+				inputmode="url"
+				placeholder="https://your-instance.example.com"
+				autocomplete="off"
+				spellcheck="false"
+			/>
+		</label>
+	</div>
+
+	<p id="api-explorer-status" role="status" aria-live="polite" class="status-region"></p>
+
+	<div id="swagger-ui"></div>
+
+	<link rel="stylesheet" href="/vendor/swagger-ui/swagger-ui.css" />
+	<script is:inline defer src="/vendor/swagger-ui/swagger-ui-bundle.js"></script>
+	<script is:inline defer src="/vendor/swagger-ui/swagger-ui-standalone-preset.js"></script>
+	<script is:inline defer src="/assets/api-explorer.js"></script>
+</StarlightPage>
+
+<style>
+	.api-explorer-controls {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 1.5rem;
+		margin-block: 1.5rem;
+	}
+	.api-explorer-controls label {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+		font-size: 0.875rem;
+		font-weight: 600;
+		flex: 1 1 16rem;
+	}
+	.api-explorer-controls select,
+	.api-explorer-controls input {
+		font: inherit;
+		font-weight: 400;
+		padding: 0.5rem 0.65rem;
+		border: 1px solid var(--sl-color-gray-5);
+		border-radius: 0.25rem;
+		background: var(--sl-color-bg);
+		color: var(--sl-color-text);
+	}
+</style>
