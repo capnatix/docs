@@ -74,15 +74,19 @@ import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 		display: none;
 	}
 
-	/* ContentPanel's own inline padding (1.5rem var(--sl-content-pad-x)) and
+	/* ContentPanel's own inline padding (var(--sl-content-pad-x)) and
 	   sl-container's auto margin-inline centering are what left visible
-	   space on either side of the title/toolbar/iframe -- zeroed on this
-	   page only so the iframe genuinely reaches both edges instead of
-	   sitting inside them. */
-	.content-panel {
+	   space on either side of the toolbar/iframe -- zeroed on this page
+	   only so the iframe genuinely reaches both edges instead of sitting
+	   inside them. Scoped to :not(:has(h1)) -- the page TITLE lives in its
+	   own, separate ContentPanel (Page.astro renders one just for
+	   PageTitle, a second one for this page's own slotted content), and
+	   should keep Starlight's normal edge padding rather than sit flush
+	   against the browser edge itself. */
+	.content-panel:not(:has(h1)) {
 		padding-inline: 0;
 	}
-	.sl-container {
+	.content-panel:not(:has(h1)) .sl-container {
 		max-width: none;
 		margin-inline: 0;
 	}

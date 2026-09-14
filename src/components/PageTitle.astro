@@ -1,7 +1,9 @@
 ---
 // Overrides Starlight's default PageTitle to add the API Docs version
-// picker inline with the title, right-aligned, on /api only -- everywhere
-// else this renders identically to the stock component.
+// picker inline with the title, right-aligned, on /api only, and to size
+// every page's title down to h3 with no top margin site-wide (paired with
+// capnatix.css's own .content-panel:has(h1) rule, tightening the vertical
+// space around it the same way, on every page).
 //
 // PAGE_TITLE_ID isn't part of the package's public export map (only
 // '@astrojs/starlight/components/*' and a handful of others are) -- '_top'
@@ -33,8 +35,8 @@ const isApiPage = Astro.url.pathname.replace(/\/+$/, '') === '/api';
 			column-gap: 1.5rem;
 		}
 		h1 {
-			margin-top: 1rem;
-			font-size: var(--sl-text-h1);
+			margin-top: 0;
+			font-size: var(--sl-text-h3);
 			line-height: var(--sl-line-height-headings);
 			font-weight: 600;
 			color: var(--sl-color-white);
