@@ -36,6 +36,13 @@ import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 	#redoc-frame {
 		display: block;
 		width: 100%;
+		/* Starlight's markdown.css draws vertical rhythm between any two
+		   adjacent non-inline elements (.sl-markdown-content :not(...) +
+		   :not(...) { margin-top: var(--sl-content-gap-y) }) -- it matched
+		   the (collapsed but still DOM-present) status paragraph before
+		   this iframe, adding back exactly the top gap the rest of this
+		   file's CSS was zeroing out everywhere else. */
+		margin-top: 0;
 		/* api-docs.js's sizeFrame() sets the real height (exactly the
 		   space actually remaining below this point in the viewport) the
 		   moment it runs -- a static calc() guess at how much chrome sits
@@ -87,9 +94,14 @@ import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 	   margin-inline centering are what otherwise left visible space
 	   around the toolbar/iframe on every side -- zeroed on this page only
 	   so the iframe genuinely reaches every edge instead of sitting
-	   inside them. */
+	   inside them. border-top: none because `.content-panel + .content-
+	   panel { border-top: ... }` (a divider Starlight draws between the
+	   title panel and this one) still matched -- a CSS sibling combinator
+	   counts a display: none element as a sibling too, it isn't removed
+	   from the DOM, just not painted. */
 	.content-panel:not(:has(h1)) {
 		padding: 0;
+		border-top: none;
 	}
 	.content-panel:not(:has(h1)) .sl-container {
 		max-width: none;
