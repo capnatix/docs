@@ -58,6 +58,11 @@ import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
+		/* Starlight's own vertical-rhythm rule (markdown.css: adjacent non-
+		   inline elements get margin-top) matches label + label here and
+		   only pushes down the second one -- this page's content isn't
+		   prose, so override it back to flush. */
+		margin-top: 0;
 		font-size: 0.8rem;
 		font-weight: 600;
 		color: var(--sl-color-gray-2);
