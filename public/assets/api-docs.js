@@ -60,7 +60,7 @@
   // scrollbar entirely; only the iframe's own content should ever scroll.
   function sizeFrame() {
     var top = frame.getBoundingClientRect().top;
-    var height = window.innerHeight - top - 16; // small bottom breathing room
+    var height = window.innerHeight - top; // edge-to-edge, no bottom gap
     frame.style.height = Math.max(height, 320) + "px";
   }
 

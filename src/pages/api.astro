@@ -43,8 +43,7 @@ import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 		   past 100vh and giving it a second, redundant scrollbar next to
 		   the iframe's own. This is only the pre-JS fallback. */
 		height: 40rem;
-		border: 1px solid var(--sl-color-gray-5);
-		border-radius: 0.5rem;
+		border: none;
 	}
 </style>
 
@@ -74,17 +73,23 @@ import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 		display: none;
 	}
 
-	/* ContentPanel's own inline padding (var(--sl-content-pad-x)) and
-	   sl-container's auto margin-inline centering are what left visible
-	   space on either side of the toolbar/iframe -- zeroed on this page
-	   only so the iframe genuinely reaches both edges instead of sitting
-	   inside them. Scoped to :not(:has(h1)) -- the page TITLE lives in its
-	   own, separate ContentPanel (Page.astro renders one just for
-	   PageTitle, a second one for this page's own slotted content), and
-	   should keep Starlight's normal edge padding rather than sit flush
-	   against the browser edge itself. */
+	/* The title's own ContentPanel (Page.astro renders one just for
+	   PageTitle, separate from the one holding this page's own slotted
+	   content below) still took up space from its own padding even with
+	   the h1 inside it reduced to sr-only (position: absolute, so it
+	   contributes no height itself -- the PANEL's padding is what
+	   remained). Collapsed outright instead of just hiding its content. */
+	.content-panel:has(h1) {
+		display: none;
+	}
+
+	/* ContentPanel's own padding and sl-container's max-width/auto
+	   margin-inline centering are what otherwise left visible space
+	   around the toolbar/iframe on every side -- zeroed on this page only
+	   so the iframe genuinely reaches every edge instead of sitting
+	   inside them. */
 	.content-panel:not(:has(h1)) {
-		padding-inline: 0;
+		padding: 0;
 	}
 	.content-panel:not(:has(h1)) .sl-container {
 		max-width: none;
