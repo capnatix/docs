@@ -52,6 +52,18 @@
     frame.src = "/api-viewer/?spec=" + encodeURIComponent(spec) + "&theme=" + theme;
   }
 
+  // The iframe's height was a static CSS calc() guess at how much chrome
+  // sits above it (Starlight's fixed header, page title, toolbar) -- close
+  // enough on some viewports, too short on others, letting the outer page
+  // grow past 100vh and pick up its own scrollbar alongside the iframe's
+  // own. Sizing it to exactly the real remaining space removes the outer
+  // scrollbar entirely; only the iframe's own content should ever scroll.
+  function sizeFrame() {
+    var top = frame.getBoundingClientRect().top;
+    var height = window.innerHeight - top - 16; // small bottom breathing room
+    frame.style.height = Math.max(height, 320) + "px";
+  }
+
   function populateVersions(manifest) {
     versionSelect.textContent = "";
     manifest.forEach(function (entry) {
@@ -63,6 +75,9 @@
   }
 
   function init() {
+    sizeFrame();
+    window.addEventListener("resize", sizeFrame);
+
     // Starlight's theme <select> updates `data-theme` synchronously on a
     // real change (and on system-preference changes, when set to "auto")
     // -- reload the iframe with the matching theme. renderFrame's own key
