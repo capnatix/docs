@@ -73,4 +73,25 @@ import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 	.content-panel footer {
 		display: none;
 	}
+
+	/* ContentPanel's own inline padding (1.5rem var(--sl-content-pad-x)) and
+	   sl-container's auto margin-inline centering are what left visible
+	   space on either side of the title/toolbar/iframe -- zeroed on this
+	   page only so the iframe genuinely reaches both edges instead of
+	   sitting inside them. */
+	.content-panel {
+		padding-inline: 0;
+	}
+	.sl-container {
+		max-width: none;
+		margin-inline: 0;
+	}
+
+	/* Belt-and-suspenders on top of sizeFrame()'s own precise measurement
+	   (public/assets/api-docs.js): the page itself should never scroll on
+	   this route, only the iframe's own content -- any leftover sub-pixel
+	   rounding that could still add an outer scrollbar is clipped instead. */
+	html {
+		overflow: hidden;
+	}
 </style>
