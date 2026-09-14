@@ -38,14 +38,10 @@ const isApiPage = Astro.url.pathname.replace(/\/+$/, '') === '/api';
 		<div class="sl-flex social-icons">
 			<SocialIcons />
 		</div>
-		{
-			isApiPage && (
-				<label class="api-docs-version">
-					<span>Version</span>
-					<select id="api-explorer-version" />
-				</label>
-			)
-		}
+		<label class="api-docs-version" class:list={{ 'is-hidden': !isApiPage }}>
+			<span>Version</span>
+			<select id="api-explorer-version" />
+		</label>
 		<ThemeSelect />
 		<LanguageSelect />
 	</div>
@@ -120,6 +116,18 @@ const isApiPage = Astro.url.pathname.replace(/\/+$/, '') === '/api';
 			font-weight: 600;
 			color: var(--sl-color-gray-2);
 			white-space: nowrap;
+		}
+		/* visibility, not display: none or a conditional (un)render --
+		   this element's own width otherwise changed the natural width of
+		   everything after it in the flex row (search-wrapper's flex: 1
+		   absorbs whatever space is left after every other item's natural
+		   width, so the whole row visibly reflowed on every Docs/API
+		   switch, the same class of bug the header's own content-width
+		   dependency caused before). visibility: hidden keeps the space
+		   reserved either way, and also drops it from tab order/AT on
+		   pages where it isn't usable. */
+		.api-docs-version.is-hidden {
+			visibility: hidden;
 		}
 		.api-docs-version select {
 			appearance: none;
