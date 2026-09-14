@@ -50,12 +50,22 @@
     },
   };
 
+  // Starlight sets `data-theme` more than once during a normal page load
+  // (an early FOUC-prevention script, then again when <starlight-theme-
+  // select> upgrades) with the SAME final value both times -- a
+  // MutationObserver fires on every attribute write, not just real value
+  // changes, so without this guard those two identical writes were enough
+  // to wipe and remount Redoc a second time moments after its first mount.
+  // A click landing in that window hit a component mid-teardown and
+  // silently did nothing; this is what that looked like as a bug report.
+  var lastAppliedTheme = null;
+
   function setStatus(text) {
     if (statusEl) statusEl.textContent = text;
   }
 
   function currentTheme() {
-    return document.documentElement.dataset.theme === "light" ? LIGHT_THEME : DARK_THEME;
+    return document.documentElement.dataset.theme === "light" ? "light" : "dark";
   }
 
   function renderRedoc(specUrl) {
@@ -63,11 +73,12 @@
       setStatus("Couldn't load the API reference's viewer.");
       return;
     }
+    lastAppliedTheme = currentTheme();
     container.textContent = "";
     window.Redoc.init(
       specUrl,
       {
-        theme: currentTheme(),
+        theme: lastAppliedTheme === "light" ? LIGHT_THEME : DARK_THEME,
         hideDownloadButton: false,
         expandResponses: "200,201",
       },
@@ -93,9 +104,11 @@
 
   function init() {
     // Redoc's theme is applied once at init, not reactively via CSS, so a
-    // site theme change re-renders it rather than just flipping a class.
+    // real site theme change re-renders it rather than just flipping a
+    // class -- guarded by lastAppliedTheme above against the attribute
+    // being (re)written to the same value it already was.
     new MutationObserver(function () {
-      if (versionSelect.value) onVersionChange();
+      if (versionSelect.value && currentTheme() !== lastAppliedTheme) onVersionChange();
     }).observe(document.documentElement, {
       attributes: true,
       attributeFilter: ["data-theme"],

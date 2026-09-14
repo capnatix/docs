@@ -32,25 +32,6 @@ import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 		display: none;
 	}
 
-	/* Redoc expects to own the scroll container its sidebar/scroll-spy
-	   measure against. Left in normal document flow, it ends up tracking
-	   the OUTER page's scroll instead of its own -- its click-to-expand
-	   sidebar items then only visually catch up once a scroll event fires
-	   on the right element, instead of immediately on click. Bounding it to
-	   its own fixed, independently-scrolling box (the standard Redoc
-	   integration pattern) gives it a scroll container that's unambiguously
-	   its own. */
-	#redoc-container {
-		height: calc(100vh - var(--sl-nav-height, 3.5rem) - 8rem);
-		min-height: 32rem;
-		/* auto, not hidden: Redoc's sidebar/right-panel use position: sticky
-		   internally, which sticks to the nearest ancestor whose overflow
-		   isn't visible -- auto makes THIS div that ancestor (and its own
-		   scroll container), instead of the sticky panels attaching to the
-		   page/window's scroll the way overflow: hidden left them doing. */
-		overflow-y: auto;
-		overflow-x: hidden;
-	}
 </style>
 
 <style is:global>
@@ -61,5 +42,16 @@ import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 	   despite the global flag. */
 	:root {
 		--sl-content-width: 90rem;
+	}
+
+	/* Redoc's field-group labels ("Authorizations:", "Request Body
+	   schema:", "Response Schema:", ...) use a hardcoded near-black color
+	   (rgba(38, 50, 56, 0.7)) baked into their styled-component, not
+	   derived from the theme object passed to Redoc.init -- so it can't be
+	   fixed by DARK_THEME in api-docs.js, and goes near-invisible against
+	   our dark background. Overridden directly, dark mode only (fine as-is
+	   against a light background). */
+	:root:not([data-theme='light']) #redoc-container h5 {
+		color: rgba(228, 230, 230, 0.85);
 	}
 </style>
