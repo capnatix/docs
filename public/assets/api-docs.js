@@ -35,6 +35,14 @@
 
   function setStatus(text) {
     if (statusEl) statusEl.textContent = text;
+    // The status paragraph showing/hiding changes how much vertical space
+    // it takes above the iframe -- sizeFrame() only ever ran once, at
+    // init(), before this function's own first call could show "Loading
+    // available versions…" and push the iframe down without a re-measure.
+    // With html { overflow: hidden } on this page (api.astro), that gap
+    // wasn't a visible scrollbar, it was silently clipped content at the
+    // iframe's own bottom edge.
+    sizeFrame();
   }
 
   function currentTheme() {
@@ -60,7 +68,7 @@
   // scrollbar entirely; only the iframe's own content should ever scroll.
   function sizeFrame() {
     var top = frame.getBoundingClientRect().top;
-    var height = window.innerHeight - top - 16; // small bottom breathing room
+    var height = window.innerHeight - top; // edge-to-edge, no bottom gap
     frame.style.height = Math.max(height, 320) + "px";
   }
 

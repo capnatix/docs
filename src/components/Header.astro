@@ -1,14 +1,24 @@
 ---
-// Overrides Starlight's default Header to add a top-nav link to /api/,
-// placed right before the theme toggle -- everything else here is copied
-// verbatim from @astrojs/starlight/components/Header.astro so the rest of
-// the header keeps behaving exactly like stock Starlight.
+// Overrides Starlight's default Header to add:
+// - a top-nav Docs/API tab switcher, right after the site title
+// - the API Docs version picker, right before the theme toggle, visible
+//   only on /api -- moved here from src/components/PageTitle.astro
+//   (which used to render it next to the page's own h1, now removed
+//   there in favor of the visible "Capnatix External API" heading
+//   Redoc's own spec already renders directly below it)
+// Also drops the stock social-icons slot and its divider entirely --
+// this site has no `social` entries configured (astro.config.mjs), so
+// <SocialIcons /> rendered nothing, but its divider line still drew on
+// its own, unconditionally, leaving a stray vertical tick with nothing
+// to its left.
+// Everything else here is copied verbatim from @astrojs/starlight/
+// components/Header.astro so the rest of the header keeps behaving
+// exactly like stock Starlight.
 import config from 'virtual:starlight/user-config';
 
 import LanguageSelect from 'virtual:starlight/components/LanguageSelect';
 import Search from 'virtual:starlight/components/Search';
 import SiteTitle from 'virtual:starlight/components/SiteTitle';
-import SocialIcons from 'virtual:starlight/components/SocialIcons';
 import ThemeSelect from 'virtual:starlight/components/ThemeSelect';
 
 const shouldRenderSearch =
@@ -21,14 +31,18 @@ const isApiPage = Astro.url.pathname.replace(/\/+$/, '') === '/api';
 	<div class="title-wrapper sl-flex">
 		<SiteTitle />
 	</div>
-	<div class="sl-flex print:hidden">
+	<nav class="tab-switcher" aria-label="Section">
+		<a href="/" aria-current={isApiPage ? undefined : 'page'}>Docs</a>
+		<a href="/api/" aria-current={isApiPage ? 'page' : undefined}>API</a>
+	</nav>
+	<div class="sl-flex search-wrapper print:hidden">
 		{shouldRenderSearch && <Search />}
 	</div>
 	<div class="sl-hidden md:sl-flex print:hidden right-group">
-		<div class="sl-flex social-icons">
-			<SocialIcons />
-		</div>
-		<a href="/api/" class="api-docs-link" aria-current={isApiPage ? 'page' : undefined}>API Docs</a>
+		<label class="api-docs-version" class:list={{ 'is-hidden': !isApiPage }}>
+			<span>Version</span>
+			<select id="api-explorer-version" />
+		</label>
 		<ThemeSelect />
 		<LanguageSelect />
 	</div>
@@ -51,56 +65,112 @@ const isApiPage = Astro.url.pathname.replace(/\/+$/, '') === '/api';
 			min-width: 0;
 		}
 
-		.right-group,
-		.social-icons {
-			gap: 1rem;
-			align-items: center;
+		/* Compact by default -- below 50rem (where the site title's own
+		   overflow:clip/min-width:0 is the header's only other flexible
+		   element) this used fixed desktop-sized padding, squeezing the
+		   logo/title harder than the single link it replaced ever did (that
+		   link was hidden below the same breakpoint; this is core
+		   navigation now, so hiding it isn't the right trade either).
+		   Widens to the original sizing at the same 50rem breakpoint the
+		   rest of this header already switches to a desktop layout at. */
+		.tab-switcher {
+			display: flex;
+			gap: 0.2rem;
+			padding: 0.15rem;
+			border: 1px solid var(--sl-color-gray-5);
+			border-radius: 999px;
+			flex-shrink: 0;
 		}
-		.social-icons::after {
-			content: '';
-			height: 2rem;
-			border-inline-end: 1px solid var(--sl-color-gray-5);
-		}
-
-		.api-docs-link {
-			font-size: var(--sl-text-sm);
+		.tab-switcher a {
+			padding: 0.25rem 0.6rem;
+			border-radius: 999px;
+			font-size: var(--sl-text-xs);
 			font-weight: 600;
 			color: var(--sl-color-gray-2);
 			text-decoration: none;
 			white-space: nowrap;
 		}
-		.api-docs-link:hover {
+		.tab-switcher a:hover {
 			color: var(--sl-color-white);
 		}
-		.api-docs-link[aria-current='page'] {
-			color: var(--sl-color-text-accent);
+		.tab-switcher a[aria-current='page'] {
+			background: var(--sl-color-gray-6);
+			color: var(--sl-color-white);
+		}
+
+		.right-group {
+			gap: 1rem;
+			align-items: center;
+		}
+
+		.api-docs-version {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+			font-size: var(--sl-text-xs);
+			font-weight: 600;
+			color: var(--sl-color-gray-2);
+			white-space: nowrap;
+		}
+		/* visibility, not display: none or a conditional (un)render --
+		   this element's own width otherwise changed the natural width of
+		   everything after it in the flex row (search-wrapper's flex: 1
+		   absorbs whatever space is left after every other item's natural
+		   width, so the whole row visibly reflowed on every Docs/API
+		   switch, the same class of bug the header's own content-width
+		   dependency caused before). visibility: hidden keeps the space
+		   reserved either way, and also drops it from tab order/AT on
+		   pages where it isn't usable. */
+		.api-docs-version.is-hidden {
+			visibility: hidden;
+		}
+		.api-docs-version select {
+			appearance: none;
+			box-sizing: border-box;
+			height: 2.25rem;
+			line-height: 2.25rem;
+			font: inherit;
+			font-weight: 400;
+			font-size: var(--sl-text-sm);
+			padding: 0 1.75rem 0 0.6rem;
+			border: 1px solid var(--sl-color-gray-5);
+			border-radius: 0.25rem;
+			background-color: var(--sl-color-bg);
+			color: var(--sl-color-text);
+			min-width: 9rem;
+			background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+				linear-gradient(135deg, currentColor 50%, transparent 50%);
+			background-position:
+				calc(100% - 1.1rem) center,
+				calc(100% - 0.75rem) center;
+			background-size:
+				0.35rem 0.35rem,
+				0.35rem 0.35rem;
+			background-repeat: no-repeat;
 		}
 
 		@media (min-width: 50rem) {
-			:global(:root[data-has-sidebar]) {
-				--__sidebar-pad: calc(2 * var(--sl-nav-pad-x));
+			.tab-switcher {
+				gap: 0.25rem;
+				padding: 0.2rem;
 			}
-			:global(:root:not([data-has-toc])) {
-				--__toc-width: 0rem;
+			.tab-switcher a {
+				padding: 0.3rem 0.9rem;
+				font-size: var(--sl-text-sm);
 			}
-			.header {
-				--__sidebar-width: max(0rem, var(--sl-content-inline-start, 0rem) - var(--sl-nav-pad-x));
-				--__main-column-fr: calc(
-					(
-							100% + var(--__sidebar-pad, 0rem) - var(--__toc-width, var(--sl-sidebar-width)) -
-								(2 * var(--__toc-width, var(--sl-nav-pad-x))) - var(--sl-content-inline-start, 0rem) -
-								var(--sl-content-width)
-						) / 2
-				);
-				display: grid;
-				grid-template-columns:
-					minmax(
-						calc(var(--__sidebar-width) + max(0rem, var(--__main-column-fr) - var(--sl-nav-gap))),
-						auto
-					)
-					1fr
-					auto;
-				align-content: center;
+
+			/* Stock Starlight aligns the search box's column width to
+			   --sl-content-width via the calc() grid this replaced, so the
+			   header visually lines up with the sidebar/content boundary
+			   below it. That variable now varies hugely page to page --
+			   Docs pages keep Starlight's sidebar-width default, the API
+			   page widens it to fill the page with no sidebar at all (see
+			   api.astro) -- which made the whole header visibly reflow
+			   between the two on every Docs/API switch. A plain flex row
+			   doesn't depend on --sl-content-width at all, so it can't. */
+			.search-wrapper {
+				flex: 1;
+				max-width: 30rem;
 			}
 		}
 	}

@@ -7,6 +7,7 @@ import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 		description: 'Reference for the Capnatix external API — pick a released version to browse its contract.',
 		tableOfContents: false,
 	}}
+	hasSidebar={false}
 >
 	<p id="api-explorer-status" role="status" aria-live="polite" class="status-region"></p>
 
@@ -35,6 +36,13 @@ import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 	#redoc-frame {
 		display: block;
 		width: 100%;
+		/* Starlight's markdown.css draws vertical rhythm between any two
+		   adjacent non-inline elements (.sl-markdown-content :not(...) +
+		   :not(...) { margin-top: var(--sl-content-gap-y) }) -- it matched
+		   the (collapsed but still DOM-present) status paragraph before
+		   this iframe, adding back exactly the top gap the rest of this
+		   file's CSS was zeroing out everywhere else. */
+		margin-top: 0;
 		/* api-docs.js's sizeFrame() sets the real height (exactly the
 		   space actually remaining below this point in the viewport) the
 		   moment it runs -- a static calc() guess at how much chrome sits
@@ -42,21 +50,11 @@ import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 		   past 100vh and giving it a second, redundant scrollbar next to
 		   the iframe's own. This is only the pre-JS fallback. */
 		height: 40rem;
-		border: 1px solid var(--sl-color-gray-5);
-		border-radius: 0.5rem;
+		border: none;
 	}
 </style>
 
 <style is:global>
-	/* Starlight's default content column (--sl-content-width: 45rem) is sized
-	   for prose, not for Redoc's three-panel layout -- widen it on this page
-	   only. This file's own is:global styles only ever ship on /api (this
-	   page's own output), so there's no cross-page leak to guard against
-	   despite the global flag. */
-	:root {
-		--sl-content-width: 90rem;
-	}
-
 	/* Starlight's own page footer (edit-this-page / prev-next links) rendered
 	   below the iframe, adding height sizeFrame() never accounted for (it
 	   only measures the iframe's own top down to the viewport's bottom) --
@@ -65,5 +63,57 @@ import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 	   embed anyway, so hidden here rather than measured around. */
 	.content-panel footer {
 		display: none;
+	}
+
+	/* The title's own ContentPanel (Page.astro renders one just for
+	   PageTitle, separate from the one holding this page's own slotted
+	   content below) still took up space from its own padding even with
+	   the h1 inside it reduced to sr-only (position: absolute, so it
+	   contributes no height itself -- the PANEL's padding is what
+	   remained). Zeroed instead of display: none -- that would take the
+	   sr-only h1 out of the accessibility tree entirely (sr-only relies on
+	   staying in the tree, just visually clipped) and break the site's
+	   Skip-to-content link, whose target is this same h1's id="_top". With
+	   the panel's own padding at 0 and its only child position: absolute
+	   (out of normal flow), the panel still collapses to zero visual
+	   height on its own -- no display: none needed to get there. */
+	.content-panel:has(h1) {
+		padding: 0;
+	}
+
+	/* ContentPanel's own padding and sl-container's max-width/auto
+	   margin-inline centering are what otherwise left visible space
+	   around the toolbar/iframe on every side -- zeroed on this page only
+	   so the iframe genuinely reaches every edge instead of sitting
+	   inside them. border-top: none because `.content-panel + .content-
+	   panel { border-top: ... }` (a divider Starlight draws between the
+	   title panel and this one) still matched -- a CSS sibling combinator
+	   counts a display: none element as a sibling too, it isn't removed
+	   from the DOM, just not painted.
+
+	   max-width: none is the ONLY thing capping this column's width --
+	   an earlier attempt also pinned --sl-content-width to a large value
+	   on this page, on the theory that was the live constraint; it never
+	   was. hasSidebar={false} above makes Starlight apply its own
+	   `html:not([data-has-sidebar]) { --sl-content-width: 67.5rem }`,
+	   which wins over any page-level override of that same variable
+	   (confirmed via computed styles, not assumed) -- max-width: none
+	   here bypasses the variable entirely rather than trying to out-value
+	   it. */
+	.content-panel:not(:has(h1)) {
+		padding: 0;
+		border-top: none;
+	}
+	.content-panel:not(:has(h1)) .sl-container {
+		max-width: none;
+		margin-inline: 0;
+	}
+
+	/* Belt-and-suspenders on top of sizeFrame()'s own precise measurement
+	   (public/assets/api-docs.js): the page itself should never scroll on
+	   this route, only the iframe's own content -- any leftover sub-pixel
+	   rounding that could still add an outer scrollbar is clipped instead. */
+	html {
+		overflow: hidden;
 	}
 </style>

@@ -148,6 +148,40 @@ button:focus-visible {
 	border-radius: 2px;
 }
 
+/* Tightens the vertical whitespace immediately around the page title,
+   site-wide -- Starlight's ContentPanel wraps the title in its own
+   `.content-panel` with 1.5rem top+bottom padding, same as the separate
+   content-panel below it that wraps the actual body copy. :has(h1) singles
+   out just the title's own panel (id="_top", from src/components/
+   PageTitle.astro) so the body-content panel's own spacing is untouched.
+   Paired with that component's own h1 sizing (h3-equivalent, no top
+   margin) for the same "smaller, tighter title" treatment everywhere. */
+.content-panel:has(h1) {
+	padding-block: 0.5rem;
+}
+
+/* Starlight's Previous/Next page-navigation links render the target
+   page's own title at --sl-text-2xl (24px) -- heading-sized, on a plain
+   navigation control. Site-wide, not just one page: Pagination.astro
+   renders in every page's Footer. */
+.pagination-links .link-title {
+	font-size: var(--sl-text-base);
+}
+
+/* Starlight auto-widens --sl-content-width (45rem -> 67.5rem) on any page
+   with tableOfContents: false in its frontmatter (Page.astro: `html:not(
+   [data-has-toc]) { --sl-content-width: 67.5rem }`) -- src/pages/
+   releases.astro sets that, ordinary Docs content pages don't, so the
+   content column's own width (and, since it's centered in the space
+   remaining after the sidebar, its left edge too) visibly shifted on
+   every navigation between a Releases-like page and a normal one. Fixed
+   at the wider value everywhere, unconditionally, rather than picked per
+   page -- also means every content page gets to use the wider column
+   Releases already had. */
+:root {
+	--sl-content-width: 67.5rem;
+}
+
 /* Release-card component rules (D1/D3) — used by public/assets/releases.js.
    The class names below (.card, .badge, .meta, .asset-list, .retry-button,
    .status-region, .release-list) are a contract with that script: renaming
