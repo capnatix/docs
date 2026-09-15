@@ -60,9 +60,11 @@ in `app.env`. Open it and fill in:
 - **`INF_FRONTEND_URL`** — the URL you'll reach this instance at, e.g.
   `https://app.your-domain.com`. Used for CORS and links in outgoing
   email.
-- **File storage** — set `STORAGE_PROVIDER` to `s3` or `azure`
-  (recommended) with your bucket/credential fields, or leave it as `local`
-  for a quick evaluation install (files then live on this one host).
+- **File storage** — the template defaults `STORAGE_PROVIDER` to `s3`;
+  fill in your bucket/credential fields below it, switch to `azure` with
+  its own credentials, or change it to `local` for a quick evaluation
+  install (files then live on this one host, with nothing else to
+  configure).
 
 A few values are left at their template default on purpose, because
 they're real external credentials this host has no way to generate for
@@ -109,8 +111,9 @@ boot — run it again any time you pull a newer image.
 docker compose --env-file app.env ps
 ```
 
-Every service should show as running (Postgres and Redis specifically as
-`healthy`, once their startup check passes). Visit `INF_FRONTEND_URL` (or
+Every service should show as running (Postgres, Redis, and the AI proxy's
+own database specifically as `healthy`, once their startup checks pass).
+Visit `INF_FRONTEND_URL` (or
 the host's IP if you haven't pointed a domain at it yet) — you should see
 the Capnatix login screen. There's no account to log in with yet by
 design; that's what [First User Setup](/getting-started/first-user-setup/)

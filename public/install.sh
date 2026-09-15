@@ -65,8 +65,23 @@ fi
 DOCKER="docker"
 if ! docker info >/dev/null 2>&1; then
   # Freshly installed and this shell hasn't picked up the new docker group
-  # membership yet -- fall back to sudo for the rest of this run.
-  DOCKER="sudo docker"
+  # membership yet -- fall back to sudo for the rest of this run, the same
+  # way as_root() above does, with the same clear error if sudo isn't even
+  # there (code review: this used to fall back to "sudo docker"
+  # unconditionally, which on a host with no sudo binary at all just fails
+  # every docker command with a bare "sudo: command not found" instead of
+  # a diagnosis pointing at the actual problem).
+  if [ "$(id -u)" != "0" ]; then
+    if command -v sudo >/dev/null 2>&1; then
+      DOCKER="sudo docker"
+    else
+      echo "install.sh: docker was installed but isn't usable yet by $(id -un), and sudo isn't available to fall back on. Log out and back in (or run 'newgrp docker'), then re-run this script." >&2
+      exit 1
+    fi
+  fi
+  # Root and docker info still failing: leave DOCKER as plain "docker" so
+  # the next real docker command surfaces its own actual error (e.g. the
+  # daemon isn't running) instead of this script guessing wrong.
 fi
 
 if ! command -v openssl >/dev/null 2>&1; then
@@ -111,7 +126,10 @@ if [ -f "$DIR/app.env" ]; then
   TEMPLATE="$DIR/.app.env.template.$$"
   $DOCKER cp "$CID:/dist/env.prod.example" "$TEMPLATE"
   ADDED=0
-  while IFS= read -r line; do
+  # `|| [ -n "$line" ]` -- without it, a final line with no trailing
+  # newline (read returns non-zero on that partial read, even though it
+  # still populated $line) would be silently skipped entirely.
+  while IFS= read -r line || [ -n "$line" ]; do
     case "$line" in
       [A-Z_]*=*)
         key="${line%%=*}"
@@ -178,7 +196,13 @@ bytes_for() {
 # revision is generated automatically here with no script change needed;
 # only a genuinely new EXTERNAL credential needs a line added above.
 GENERATED=0
-while IFS= read -r line; do
+# `|| [ -n "$line" ]` -- same reason as the merge loop above: don't
+# silently skip a final CHANGE-ME line that happens to lack a trailing
+# newline. Today's template ends with one, so this doesn't currently
+# change behavior -- it's a guarantee against a future template edit
+# quietly reintroducing the exact "looks generated but wasn't" failure
+# mode this whole redesign exists to close (API_KEY, INVOS-877).
+while IFS= read -r line || [ -n "$line" ]; do
   case "$line" in
     [A-Z_]*=CHANGE-ME*)
       key="${line%%=*}"
