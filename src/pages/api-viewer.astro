@@ -18,7 +18,19 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="robots" content="noindex" />
 		<title>API Docs</title>
-		<style>
+		{/* is:global -- this page's whole point is to host Redoc's own,
+		   dynamically React-rendered DOM (#redoc-container's children,
+		   .api-info-details, the react-tabs markup). Astro's default
+		   per-component CSS scoping appends a generated class to every
+		   selector segment (h5:where(.astro-xxxx)), which only elements
+		   present in this file's own static template ever carry -- Redoc's
+		   injected h5/summary/li elements never do, so a scoped rule
+		   targeting them silently never matches (confirmed via computed
+		   styles: the color rule below was present in the compiled CSS but
+		   never applied). This is a single-purpose document with nothing
+		   else to collide with, so going global is the actual fix rather
+		   than a workaround. */}
+		<style is:global>
 			html,
 			body {
 				margin: 0;
@@ -37,6 +49,83 @@
 			   .theme-dark to <html> when rendering the dark theme. */
 			.theme-dark #redoc-container h5 {
 				color: rgba(228, 230, 230, 0.85);
+			}
+
+			/* Same hardcoded-default-text-color issue as the h5 labels above,
+			   on two more spots Redoc doesn't route through the theme object:
+			   the request/response "media type" badge next to a schema
+			   label (e.g. "application/json"), and the body text of Redoc's
+			   own hover tooltips (e.g. "This is a versioned URL -- future
+			   breaking changes ship as a new version..." on a path
+			   variable). Both render solid/near-solid black regardless of
+			   theme. Targeted by Redoc's own generated class names rather
+			   than a generic tag selector -- neither element type is
+			   otherwise identifiable, and both classes come from the
+			   vendored, pinned Redoc build (public/vendor/redoc), so they
+			   only change if that build is deliberately upgraded. */
+			.theme-dark #redoc-container .sc-cWSHoV,
+			.theme-dark #redoc-container [aria-hidden='true'] p {
+				color: rgba(228, 230, 230, 0.85);
+			}
+
+			/* The HTTP-method badge (sidebar entries, and the endpoint's own
+			   "POST /path" heading) is plain white text on the method's own
+			   colors.http.* background -- fine against options' dark navy
+			   (#0d5aa7), but every other method color in DARK_THEME is
+			   light/saturated enough that white text fails WCAG AA against
+			   it (get 2.78:1, post 2.01:1, delete 3.63:1, all below the
+			   4.5:1 floor for this badge's small bold text -- measured via
+			   the same relative-luminance formula WCAG uses). Dark text
+			   passes comfortably against all of them (5:1-9:1) and is what
+			   was asked for directly ("green bg pill... contrast color
+			   text like navy or black"); the one exception is carved back
+			   out to white since dark-on-navy is the one combination that
+			   goes the other way (2.64:1). */
+			.theme-dark .operation-type {
+				color: #0e161b;
+			}
+			.theme-dark .operation-type.options {
+				color: rgb(228, 230, 230);
+			}
+
+			/* The plain "Payload"/language tab above a request sample (no
+			   http-status color of its own) uses the same light silver
+			   swatch for its SELECTED background in every theme, relying on
+			   the surrounding page's default dark text for contrast -- fine
+			   on Redoc's light default, invisible once colors.text.primary
+			   is overridden light for the rest of this dark theme (the
+			   background stayed silver, the text became silver too).
+			   Response-status tabs aren't affected: their selected text is
+			   colored from the response's own semantic color (success/
+			   error/redirect/info), not text.primary, so they already read
+			   fine -- excluded here by ALL FOUR of Redoc's status classes
+			   (confirmed against the vendored redoc@2.5.4 source: tab-
+			   success, tab-error, tab-redirect, tab-info each carry their
+			   own theme-driven selected color). The first version of this
+			   rule only excluded tab-success/tab-error and, having higher
+			   specificity than Redoc's own per-status rule, silently
+			   overwrote the amber/blue redirect/info colors on any endpoint
+			   documenting a 1xx or 3xx response -- caught in code review. */
+			.theme-dark
+				.react-tabs__tab--selected:not(.tab-success):not(.tab-error):not(.tab-redirect):not(
+					.tab-info
+				) {
+				color: #1c403b;
+			}
+
+			/* Collapsible wrapper api-viewer.js builds around the spec's long
+			   info.description markdown -- see enhanceInfoSection() there. */
+			.api-info-details {
+				margin-block: 1em 0;
+			}
+			.api-info-details summary {
+				cursor: pointer;
+				font-weight: 600;
+				padding-block: 0.25em;
+				color: #11736b;
+			}
+			.theme-dark .api-info-details summary {
+				color: #4fd1c5;
 			}
 		</style>
 	</head>

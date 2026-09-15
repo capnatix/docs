@@ -72,6 +72,65 @@
     },
   };
 
+  // Redoc has no init option for either of these -- both are post-render
+  // DOM edits, applied once per render via a MutationObserver (Redoc's
+  // init() is async: spec fetch + parse + React render, with no public
+  // "onComplete" in the standalone bundle to hook instead).
+  function enhanceInfoSection(container) {
+    var infoDiv = container.querySelector(".api-info");
+    if (!infoDiv) return;
+
+    // The version dropdown in the parent page's own navbar is the one
+    // source of truth for which version is showing -- Redoc's own h1
+    // (built from the spec's info.title + info.version) restated both,
+    // redundantly, right below it.
+    var h1 = infoDiv.querySelector("h1");
+    if (h1) h1.textContent = "Capnatix API Doc";
+
+    // Collapses the long info.description markdown (everything Redoc
+    // renders after the "Download OpenAPI specification" line) into a
+    // closed <details> panel -- useful reference, not something a visitor
+    // should have to scroll past by default to reach the actual
+    // endpoints. Grabbed as "every sibling after the download <p>" rather
+    // than by class name: Redoc's own classes here are generated,
+    // per-build hashes, not a stable public API to select against.
+    var downloadP = infoDiv.querySelector("p");
+    if (!downloadP || downloadP.dataset.enhanced) return;
+    downloadP.dataset.enhanced = "true";
+    var rest = [];
+    var node = downloadP.nextElementSibling;
+    while (node) {
+      var next = node.nextElementSibling;
+      rest.push(node);
+      node = next;
+    }
+    if (rest.length === 0) return;
+
+    var details = infoDiv.ownerDocument.createElement("details");
+    details.className = "api-info-details";
+    var summary = infoDiv.ownerDocument.createElement("summary");
+    summary.textContent = "About this API";
+    details.appendChild(summary);
+    rest.forEach(function (el) {
+      details.appendChild(el);
+    });
+    downloadP.insertAdjacentElement("afterend", details);
+  }
+
+  function watchAndEnhance(container) {
+    var applied = false;
+    function tryApply() {
+      if (applied) return;
+      if (!container.querySelector(".api-info h1")) return;
+      applied = true;
+      enhanceInfoSection(container);
+      observer.disconnect();
+    }
+    var observer = new MutationObserver(tryApply);
+    observer.observe(container, { childList: true, subtree: true });
+    tryApply();
+  }
+
   var params = new URLSearchParams(location.search);
   var specUrl = params.get("spec");
   var isDark = params.get("theme") !== "light";
@@ -82,10 +141,8 @@
   }
 
   if (specUrl && window.Redoc) {
-    window.Redoc.init(
-      specUrl,
-      { theme: theme, hideDownloadButton: false },
-      document.getElementById("redoc-container")
-    );
+    var container = document.getElementById("redoc-container");
+    watchAndEnhance(container);
+    window.Redoc.init(specUrl, { theme: theme, hideDownloadButton: false }, container);
   }
 })();
