@@ -44,9 +44,13 @@ folder behind with exactly two files:
   the script already did it.
 
 Prefer to look before you run it? `curl -fsSL https://docs.capnatix.com/install.sh -o install.sh`, read it, then `sh install.sh --dir=./capnatix`. It's also
-safe to re-run — it never overwrites an `app.env` that already exists, so
-running it again (say, to pick up a newer `docker-compose.yaml`) can't
-desync your secrets from a database that already initialized with them.
+safe to re-run: it never overwrites either file once it exists, so it
+can't desync your secrets from a database that already initialized with
+them, or silently discard an edit you've made to `docker-compose.yaml`
+(e.g. the TLS block below). If you want a newer release's copy of either
+file, remove it yourself first — a re-run does add any *new* variable a
+newer template has introduced to `app.env`, appended without touching
+what's already there.
 
 ## 2. Fill in what only you know
 
@@ -60,9 +64,20 @@ in `app.env`. Open it and fill in:
   (recommended) with your bucket/credential fields, or leave it as `local`
   for a quick evaluation install (files then live on this one host).
 
+A few values are left at their template default on purpose, because
+they're real external credentials this host has no way to generate for
+you — the script only fills in secrets *Capnatix itself* invents:
+
+- **`API_KEY`** — only needed for portfolio-manager backfill; leave it if
+  you're not using that.
+- **`STORAGE_ACCESS_KEY`/`STORAGE_SECRET_KEY`** — required once you set
+  `STORAGE_PROVIDER` to `s3` or `azure` above.
+
 Everything else in the file is either optional (SMTP, legacy-data
-migration, the external API) or already generated — safe to leave as-is
-for a first install.
+migration, the external API — the external API's own `EXTERNAL_API_PG_*`
+also needs a one-time database role created, not just these values; see
+its comments in `app.env` if you enable it) or already generated — safe
+to leave as-is for a first install.
 
 ## 3. Start the stack
 
@@ -72,10 +87,11 @@ docker compose --env-file app.env up -d
 ```
 
 This pulls every image and starts Postgres, Redis, the backend, the
-frontend, the scheduled-job runner, the AI proxy, and the public-facing
-proxy. The `mongo` and `external-api` services stay off — both are
-optional and profile-gated (legacy-data migration and the server-to-server
-API, respectively), not needed for a normal install.
+frontend, the scheduled-job runner, the analytics engine, the AI proxy
+(and its own database), and the public-facing proxy. The `mongo` and
+`external-api` services stay off — both are optional and profile-gated
+(legacy-data migration and the server-to-server API, respectively), not
+needed for a normal install.
 
 ## 4. Apply database migrations
 
