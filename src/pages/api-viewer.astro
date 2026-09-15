@@ -95,11 +95,21 @@
 			   on Redoc's light default, invisible once colors.text.primary
 			   is overridden light for the rest of this dark theme (the
 			   background stayed silver, the text became silver too).
-			   Response-status tabs (tab-success/tab-error) aren't affected:
-			   their selected text is colored from the response's own
-			   semantic color (green/red), not text.primary, so they already
-			   read fine and are excluded here. */
-			.theme-dark .react-tabs__tab--selected:not(.tab-success):not(.tab-error) {
+			   Response-status tabs aren't affected: their selected text is
+			   colored from the response's own semantic color (success/
+			   error/redirect/info), not text.primary, so they already read
+			   fine -- excluded here by ALL FOUR of Redoc's status classes
+			   (confirmed against the vendored redoc@2.5.4 source: tab-
+			   success, tab-error, tab-redirect, tab-info each carry their
+			   own theme-driven selected color). The first version of this
+			   rule only excluded tab-success/tab-error and, having higher
+			   specificity than Redoc's own per-status rule, silently
+			   overwrote the amber/blue redirect/info colors on any endpoint
+			   documenting a 1xx or 3xx response -- caught in code review. */
+			.theme-dark
+				.react-tabs__tab--selected:not(.tab-success):not(.tab-error):not(.tab-redirect):not(
+					.tab-info
+				) {
 				color: #1c403b;
 			}
 
