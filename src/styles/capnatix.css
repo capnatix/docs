@@ -160,6 +160,22 @@ button:focus-visible {
 	padding-block: 0.5rem;
 }
 
+/* PageTitle.astro sizes every page's own h1 down to --sl-text-h3, but
+   in-body content headings (h2, h3, ...) still use Starlight's own,
+   un-shrunk markdown.css sizes (--sl-text-h2 etc) -- one step BIGGER than
+   the h3-sized page title above them, an inverted hierarchy visible the
+   moment a page has real h2 content (getting-started/installation.md,
+   INVOS-874, was the first). Shifted the whole in-body scale down one
+   step to match: h2 at the h1's old h4 size, h3 at h5, so every heading
+   stays smaller than the page's own title, in the right order, no matter
+   how deep a page nests. */
+.sl-markdown-content h2:not(:where(.not-content *)) {
+	font-size: var(--sl-text-h4);
+}
+.sl-markdown-content h3:not(:where(.not-content *)) {
+	font-size: var(--sl-text-h5);
+}
+
 /* Starlight's Previous/Next page-navigation links render the target
    page's own title at --sl-text-2xl (24px) -- heading-sized, on a plain
    navigation control. Site-wide, not just one page: Pagination.astro
