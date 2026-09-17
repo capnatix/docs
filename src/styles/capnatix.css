@@ -160,6 +160,43 @@ button:focus-visible {
 	padding-block: 0.5rem;
 }
 
+/* PageTitle.astro sizes every page's own h1 down to --sl-text-h3, but
+   in-body content headings (h2, h3, ...) still use Starlight's own,
+   un-shrunk markdown.css sizes (--sl-text-h2 etc) -- one step BIGGER than
+   the h3-sized page title above them, an inverted hierarchy visible the
+   moment a page has real h2 content (getting-started/installation.md,
+   INVOS-874, was the first).
+
+   Shifted the whole in-body scale down, h2 through h6 -- not just h2/h3
+   (code review, INVOS-879 round 2: shifting only those two onto h4's/h5's
+   own tokens just moved the collision one level down, since h4/h5
+   themselves were left pointing at those same tokens -- invisible for the
+   same reason the original bug was, until a page nests that deep). Named
+   --sl-text-h4/h5 tokens are responsive (change at the desktop
+   breakpoint) and reused here for h2/h3 for that reason, same as before;
+   below h5 there's no smaller *named heading* token left (props.css stops
+   at h5, and markdown.css's own h6 rule references a --sl-text-h6 that
+   was never defined, silently falling back to inherited body-text size --
+   a pre-existing Starlight quirk, not something introduced here), so h4
+   onward step down through the plain, non-responsive text-size scale
+   instead. Still strictly decreasing at both breakpoints, still below the
+   h3-sized page title at every level. */
+.sl-markdown-content h2:not(:where(.not-content *)) {
+	font-size: var(--sl-text-h4);
+}
+.sl-markdown-content h3:not(:where(.not-content *)) {
+	font-size: var(--sl-text-h5);
+}
+.sl-markdown-content h4:not(:where(.not-content *)) {
+	font-size: var(--sl-text-base);
+}
+.sl-markdown-content h5:not(:where(.not-content *)) {
+	font-size: var(--sl-text-sm);
+}
+.sl-markdown-content h6:not(:where(.not-content *)) {
+	font-size: var(--sl-text-xs);
+}
+
 /* Starlight's Previous/Next page-navigation links render the target
    page's own title at --sl-text-2xl (24px) -- heading-sized, on a plain
    navigation control. Site-wide, not just one page: Pagination.astro
