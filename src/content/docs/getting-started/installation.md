@@ -120,11 +120,11 @@ design; that's what [First User Setup](/getting-started/first-user-setup/)
 is for.
 
 :::note[A note on TLS]
-The `proxy` container serves plain HTTP on `PROXY_PORT`. Terminating TLS —
-a certificate for your domain — is on you: add a `443` server block with
-your certs to the proxy, or put a load balancer or reverse proxy (e.g. a
-managed LB, Caddy, or another nginx) in front of it. Do this before
-pointing real users at the instance.
+The `proxy` container only ever serves plain HTTP on `PROXY_PORT` — its
+config is baked into the image, with nothing to edit. Terminating TLS
+needs a separate reverse proxy or load balancer in front of it; see
+[Configuration](/getting-started/configuration/#tls) for a concrete
+setup. Do this before pointing real users at the instance.
 :::
 
 ## What's next
