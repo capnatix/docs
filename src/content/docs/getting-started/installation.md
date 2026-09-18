@@ -4,11 +4,10 @@ description: 'Install Capnatix on your own infrastructure with Docker Compose.'
 ---
 
 Capnatix is self-hosted: everything runs as a set of Docker containers on a
-single host you control, behind one published port. This page gets the
-stack up and running. Once it's up, continue to
-[Configuration](/getting-started/configuration/) to review the environment
-in more depth, then [First User Setup](/getting-started/first-user-setup/)
-to create your admin login.
+single host you control, behind one published port. This page gets a
+working instance up, migrated, and with a login you can actually use.
+Once you're in, continue to [Configuration](/getting-started/configuration/)
+for a closer look at the environment behind it.
 
 ## Prerequisites
 
@@ -25,13 +24,24 @@ own hosted instances default to 2 vCPU / 8 GB RAM with 100 GB of storage.
 That's a reasonable starting point for a single instance — resize as your
 data and usage grow.
 
-## 1. Run the install script
+## 1. Get capnatix.sh
+
+`capnatix.sh` is the operator CLI for everything below — download and
+keep it, rather than piping it straight into a shell, since every command
+after the first needs a persistent copy to act on:
 
 ```bash
-curl -fsSL https://docs.capnatix.com/install.sh | sh -s -- --dir=./capnatix
+curl -fsSL https://docs.capnatix.com/capnatix.sh -o capnatix.sh
+chmod +x capnatix.sh
 ```
 
-This installs Docker if it isn't already present, then leaves a `capnatix/`
+## 2. Install
+
+```bash
+./capnatix.sh install
+```
+
+Installs Docker if it isn't already present, then leaves a `capnatix/`
 folder behind with exactly two files:
 
 - **`docker-compose.yaml`** — the stack definition.
@@ -41,10 +51,9 @@ folder behind with exactly two files:
   independently random on purpose — several of them deliberately guard
   different trust boundaries, so reusing one value across two of them is a
   real bug class, not just tidiness. You never have to think about this;
-  the script already did it.
+  the command already did it.
 
-Prefer to look before you run it? `curl -fsSL https://docs.capnatix.com/install.sh -o install.sh`, read it, then `sh install.sh --dir=./capnatix`. It's also
-safe to re-run: it never overwrites either file once it exists, so it
+Safe to re-run: it never overwrites either file once it exists, so it
 can't desync your secrets from a database that already initialized with
 them, or silently discard an edit you've made to `docker-compose.yaml`
 (e.g. the TLS block below). If you want a newer release's copy of either
@@ -52,7 +61,7 @@ file, remove it yourself first — a re-run does add any *new* variable a
 newer template has introduced to `app.env`, appended without touching
 what's already there.
 
-## 2. Fill in what only you know
+## 3. Fill in what only you know
 
 Everything the script *couldn't* know for you is still marked `CHANGE-ME`
 in `app.env`. Open it and fill in:
@@ -81,43 +90,43 @@ also needs a one-time database role created, not just these values; see
 its comments in `app.env` if you enable it) or already generated — safe
 to leave as-is for a first install.
 
-## 3. Start the stack
+## 4. Start
 
 ```bash
-cd capnatix
-docker compose --env-file app.env up -d
+./capnatix.sh start
 ```
 
-This pulls every image and starts Postgres, Redis, the backend, the
-frontend, the scheduled-job runner, the analytics engine, the AI proxy
-(and its own database), and the public-facing proxy. The `mongo` and
+Pulls every image, starts Postgres, Redis, the backend, the frontend, the
+scheduled-job runner, the analytics engine, the AI proxy (and its own
+database), and the public-facing proxy, applies any pending database
+migration, and waits until the app actually responds before returning —
+there's no separate migration step to remember. The `mongo` and
 `external-api` services stay off — both are optional and profile-gated
 (legacy-data migration and the server-to-server API, respectively), not
 needed for a normal install.
 
-## 4. Apply database migrations
+`./capnatix.sh status` shows what's running; `stop` and `restart` do what
+they say.
+
+## 5. Create your admin account
 
 ```bash
-docker compose --env-file app.env exec inf-backend \
-  sh -c "cd /app && npx knex migrate:latest"
+./capnatix.sh first-setup --admin-email=you@your-domain.com
 ```
 
-This is a one-time step per upgrade, not something that runs on every
-boot — run it again any time you pull a newer image.
+Creates your login and a default fund. Leave `--admin-password=` off and
+a strong one is generated and printed once — save it, since it's not
+shown again. Safe to re-run: an existing admin is never reset, and a fund
+is only created if the instance has none yet.
 
-## 5. Verify
-
-```bash
-docker compose --env-file app.env ps
+```
+Generated admin password (shown once, save it now): <...>
+Log in at https://app.your-domain.com -- you will be asked to set a new
+password on first login.
 ```
 
-Every service should show as running (Postgres, Redis, and the AI proxy's
-own database specifically as `healthy`, once their startup checks pass).
-Visit `INF_FRONTEND_URL` (or
-the host's IP if you haven't pointed a domain at it yet) — you should see
-the Capnatix login screen. There's no account to log in with yet by
-design; that's what [First User Setup](/getting-started/first-user-setup/)
-is for.
+Visit that URL and log in — you'll be asked to set a new password
+immediately.
 
 :::note[A note on TLS]
 The `proxy` container only ever serves plain HTTP on `PROXY_PORT` — its
@@ -129,7 +138,5 @@ setup. Do this before pointing real users at the instance.
 
 ## What's next
 
-- [Configuration](/getting-started/configuration/) — a closer look at the
-  environment you just set up.
-- [First User Setup](/getting-started/first-user-setup/) — create your
-  admin account and fund, and log in for the first time.
+[Configuration](/getting-started/configuration/) — a closer look at the
+environment you just set up.

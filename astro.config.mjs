@@ -34,7 +34,6 @@ export default defineConfig({
           items: [
             { label: 'Installation', link: '/getting-started/installation/' },
             { label: 'Configuration', link: '/getting-started/configuration/' },
-            { label: 'First User Setup', link: '/getting-started/first-user-setup/' },
           ],
         },
         { label: 'Releases', link: '/releases/' },
