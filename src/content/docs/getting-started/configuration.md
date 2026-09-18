@@ -169,3 +169,8 @@ sudo tar czf capnatix-data-$(date +%F).tar.gz /data/capnatix
 ./capnatix.sh start
 ```
 
+## What's next
+
+If you haven't yet, [Installation](/getting-started/installation/#5-create-your-admin-account)
+covers creating your admin account and logging in for the first time.
+

@@ -20,17 +20,13 @@ TAG="stable"
 ADMIN_EMAIL=""
 ADMIN_PASSWORD=""
 
+# Single pass over every arg, rather than "peel $1 off as the command,
+# then loop the rest": that two-pass shape broke on a bare `-h` (doesn't
+# match --*, so it was mistaken for the command itself) and on any flag
+# placed before the command word (code review, INVOS-883 round 2). Here,
+# the first bare/positional word found anywhere becomes the command; a
+# second one is an error, not silently ignored.
 CMD=""
-if [ "$#" -gt 0 ]; then
-  case "$1" in
-    --*) ;;
-    *)
-      CMD="$1"
-      shift
-      ;;
-  esac
-fi
-
 for arg in "$@"; do
   case "$arg" in
     --dir=*) DIR="${arg#--dir=}" ;;
@@ -38,9 +34,16 @@ for arg in "$@"; do
     --admin-email=*) ADMIN_EMAIL="${arg#--admin-email=}" ;;
     --admin-password=*) ADMIN_PASSWORD="${arg#--admin-password=}" ;;
     -h | --help) CMD="help" ;;
-    *)
+    -*)
       echo "capnatix.sh: unrecognized argument: $arg" >&2
       exit 1
+      ;;
+    *)
+      if [ -n "$CMD" ] && [ "$CMD" != "help" ]; then
+        echo "capnatix.sh: unrecognized argument: $arg" >&2
+        exit 1
+      fi
+      [ "$CMD" = "help" ] || CMD="$arg"
       ;;
   esac
 done
@@ -70,8 +73,8 @@ EOF
 }
 
 # ---------------------------------------------------------------------------
-# Shared: locating Docker, and the docker compose invocation every verb but
-# install uses.
+# Shared: locating Docker, reading app.env values, and the docker compose
+# invocation every verb but install uses.
 # ---------------------------------------------------------------------------
 as_root() {
   if [ "$(id -u)" = "0" ]; then
@@ -90,11 +93,19 @@ require_docker() {
     curl -fsSL https://get.docker.com | as_root sh -
     if [ "$(id -u)" != "0" ]; then
       as_root usermod -aG docker "$(id -un)" || true
-      echo "capnatix.sh: added $(id -un) to the docker group -- log out and back in (or run 'newgrp docker'), then re-run this command." >&2
-      exit 1
+      echo "capnatix.sh: added $(id -un) to the docker group -- this shell won't see it until you log out and back in (or run 'newgrp docker'). Falling back to sudo for the rest of THIS run." >&2
     fi
   fi
 
+  # Deliberately no exit here after a fresh install: the group membership
+  # warning above is informational, not fatal -- falling through to the
+  # sudo fallback below lets a single `install` invocation finish even on
+  # a brand new host, matching the original install.sh's behavior (a
+  # regression introduced in this rewrite, caught by code review, INVOS-
+  # 883 round 2: the earlier version exited unconditionally here, forcing
+  # an unnecessary second invocation even when sudo would have worked
+  # immediately, as it does in this exact fallback for the `docker info`
+  # case below).
   DOCKER="docker"
   if ! docker info >/dev/null 2>&1; then
     if [ "$(id -u)" != "0" ]; then
@@ -119,10 +130,34 @@ compose() {
   $DOCKER compose -f "$DIR/docker-compose.yaml" --env-file "$DIR/app.env" "$@"
 }
 
+# Reads one KEY=value line from app.env, stripping a wrapping pair of
+# quotes and any stray \r (a CRLF-saved file, common from a Windows
+# editor) -- used for every value this script reads back out of app.env
+# rather than treating it as a secret to leave untouched. Echoes empty,
+# never errors, if the key isn't present (callers apply their own
+# default with ${VAR:-...}).
+env_get() {
+  grep "^$1=" "$DIR/app.env" 2>/dev/null | head -1 | cut -d= -f2- |
+    tr -d '\r' | sed 's/^"//; s/"$//'
+}
+
+# SQL string-literal escaping (doubles embedded single quotes) for the
+# one-off self-check queries below -- an admin email containing an
+# apostrophe (valid per RFC 5321, and not excluded by initialize-fresh-
+# instance.js's own validation regex) previously broke the raw
+# interpolation here, making a successful account creation get reported
+# as a failure (code review, INVOS-883 round 2).
+sql_escape() { printf '%s' "$1" | sed "s/'/''/g"; }
+
 # ---------------------------------------------------------------------------
 # install
 # ---------------------------------------------------------------------------
 cmd_install() {
+  if [ -f "$DIR/docker-compose.yaml" ] && [ -f "$DIR/app.env" ]; then
+    log "$DIR already has docker-compose.yaml and app.env -- nothing to do (remove one first if you want a newer template's copy)"
+    return
+  fi
+
   require_docker
 
   if ! command -v openssl >/dev/null 2>&1; then
@@ -146,7 +181,9 @@ cmd_install() {
   # a real edit (app.env's generated secrets and whatever an operator has
   # filled in; docker-compose.yaml, if hand-edited) a fresh copy from a
   # newer image would discard it with no warning. Remove either yourself
-  # first if you want a newer release's copy.
+  # first if you want a newer release's copy. (The early return above
+  # handles the common case where BOTH already exist; these two checks
+  # still matter individually if only one of the two is missing.)
   if [ -f "$DIR/docker-compose.yaml" ]; then
     log "$DIR/docker-compose.yaml already exists -- leaving it untouched"
   else
@@ -248,6 +285,11 @@ cmd_start() {
   require_docker
   require_stack
 
+  PG_USER=$(env_get PG_USER)
+  PG_USER=${PG_USER:-capnatix}
+  PG_DB=$(env_get PG_DB)
+  PG_DB=${PG_DB:-capnatix}
+
   log "Starting the stack"
   compose up -d
 
@@ -255,20 +297,43 @@ cmd_start() {
   # with the rest of the stack depending on it finishing) is the cleaner
   # long-term fix -- until docker-compose.yaml has one, run it here so
   # this is still the ONE command needed, not a separate manual step.
-  log "Applying database migrations"
+  #
+  # Split into two waits, not one 30-try retry of the migrate command
+  # itself (code review, INVOS-883 round 2: that conflated "container
+  # not up yet" with "migration genuinely failed", retrying a real,
+  # deterministic failure 30 times before surfacing it). First wait for
+  # the container to actually be running -- cheap and safe to retry many
+  # times, since it can't mask a real migration error. Only once that's
+  # true does a migrate failure mean something worth reporting quickly.
+  log "Waiting for inf-backend to start"
   TRIES=0
-  until compose exec -T inf-backend sh -c "cd /app && npx knex migrate:latest"; do
+  while :; do
+    CID=$(compose ps -q inf-backend 2>/dev/null || true)
+    if [ -n "$CID" ] && [ "$($DOCKER inspect -f '{{.State.Running}}' "$CID" 2>/dev/null)" = "true" ]; then
+      break
+    fi
     TRIES=$((TRIES + 1))
     if [ "$TRIES" -ge 30 ]; then
-      echo "capnatix.sh: migration failed after $TRIES attempts -- see the error above (if inf-backend just wasn't up yet, its own logs are: docker compose -f $DIR/docker-compose.yaml --env-file $DIR/app.env logs inf-backend)." >&2
+      echo "capnatix.sh: inf-backend never started -- check 'capnatix.sh status' and its logs." >&2
       exit 1
     fi
     sleep 1
   done
+
+  log "Applying database migrations"
+  TRIES=0
+  until compose exec -T inf-backend sh -c "cd /app && npx knex migrate:latest"; do
+    TRIES=$((TRIES + 1))
+    if [ "$TRIES" -ge 3 ]; then
+      echo "capnatix.sh: migration failed after $TRIES attempts -- see the error above." >&2
+      exit 1
+    fi
+    sleep 2
+  done
   compose restart inf-cron >/dev/null
 
   log "Waiting for the app to respond"
-  PROXY_PORT=$(grep '^PROXY_PORT=' "$DIR/app.env" | cut -d= -f2-)
+  PROXY_PORT=$(env_get PROXY_PORT)
   PROXY_PORT=${PROXY_PORT:-80}
   TRIES=0
   until curl -fsS -o /dev/null "http://localhost:$PROXY_PORT/" 2>/dev/null; do
@@ -280,9 +345,9 @@ cmd_start() {
     sleep 1
   done
 
-  INF_FRONTEND_URL=$(grep '^INF_FRONTEND_URL=' "$DIR/app.env" | cut -d= -f2-)
+  INF_FRONTEND_URL=$(env_get INF_FRONTEND_URL)
   VISIT_URL=${INF_FRONTEND_URL:-http://localhost:$PROXY_PORT}
-  USER_COUNT=$(compose exec -T postgres psql -U capnatix -d capnatix -tAc \
+  USER_COUNT=$(compose exec -T postgres psql -U "$PG_USER" -d "$PG_DB" -tAc \
     "select count(*) from users" 2>/dev/null | tr -d '[:space:]')
   if [ "$USER_COUNT" = "0" ] || [ -z "$USER_COUNT" ]; then
     log "Started. Visit $VISIT_URL -- there's no account yet, run './capnatix.sh first-setup' next."
@@ -314,6 +379,16 @@ cmd_status() {
 cmd_first_setup() {
   require_docker
   require_stack
+
+  if ! command -v timeout >/dev/null 2>&1; then
+    echo "capnatix.sh: the 'timeout' command is required (used to work around a known upstream hang -- see INVOS-882) and wasn't found on this host. It ships with coreutils on every mainstream Linux distribution; on macOS, install it via 'brew install coreutils' (as gtimeout) or run this from a Linux VM instead." >&2
+    exit 1
+  fi
+
+  PG_USER=$(env_get PG_USER)
+  PG_USER=${PG_USER:-capnatix}
+  PG_DB=$(env_get PG_DB)
+  PG_DB=${PG_DB:-capnatix}
 
   if [ -z "$ADMIN_EMAIL" ]; then
     printf 'Admin email: '
@@ -352,8 +427,8 @@ cmd_first_setup() {
     echo "capnatix.sh: first-setup failed (exit $STATUS)." >&2
     exit 1
   fi
-  EXISTS=$(compose exec -T postgres psql -U capnatix -d capnatix -tAc \
-    "select 1 from users where email='${ADMIN_EMAIL}'" 2>/dev/null || true)
+  EXISTS=$(compose exec -T postgres psql -U "$PG_USER" -d "$PG_DB" -tAc \
+    "select 1 from users where email='$(sql_escape "$ADMIN_EMAIL")'" 2>/dev/null || true)
   if [ "$(echo "$EXISTS" | tr -d '[:space:]')" != "1" ]; then
     echo "capnatix.sh: could not confirm the admin account was created -- check 'capnatix.sh status' and inf-backend's logs." >&2
     exit 1
@@ -363,7 +438,7 @@ cmd_first_setup() {
     echo
     echo "Generated admin password (shown once, save it now): $ADMIN_PASSWORD"
   fi
-  INF_FRONTEND_URL=$(grep '^INF_FRONTEND_URL=' "$DIR/app.env" | cut -d= -f2-)
+  INF_FRONTEND_URL=$(env_get INF_FRONTEND_URL)
   LOGIN_URL=${INF_FRONTEND_URL:-your instance URL}
   echo "Log in at $LOGIN_URL -- you will be asked to set a new password on first login."
 }
