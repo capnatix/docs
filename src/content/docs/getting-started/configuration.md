@@ -31,7 +31,7 @@ app.your-domain.com {
 ```
 
 And a compose override, `docker-compose.tls.yaml`, layered on top of the
-one `install.sh` gave you rather than editing it directly:
+one `capnatix.sh install` gave you rather than editing it directly:
 
 ```yaml
 services:
@@ -59,6 +59,14 @@ docker compose -f docker-compose.yaml -f docker-compose.tls.yaml \
 
 Caddy reaches the `proxy` service directly over the compose network
 (`proxy:80`), regardless of what `PROXY_PORT` is set to.
+
+:::note
+`./capnatix.sh start`/`stop` only know about the single
+`docker-compose.yaml` `install` gave you. Once you're running with the
+TLS override layered on top, use the two-file `docker compose -f ... -f
+...` form above directly instead — `capnatix.sh` won't pick up the
+override on its own.
+:::
 
 ## File storage
 
@@ -150,18 +158,14 @@ docker compose --env-file app.env exec -T postgres \
 ```
 
 Or a filesystem-level backup of everything stateful, stack stopped.
-`install.sh` created `/data/capnatix` as root, so reading it back needs
-`sudo` too — without it, `tar` silently skips whatever it can't read and
-still exits looking successful, which is a worse failure than an error
-would be:
+`capnatix.sh install` created `/data/capnatix` as root, so reading it back
+needs `sudo` too — without it, `tar` silently skips whatever it can't
+read and still exits looking successful, which is a worse failure than an
+error would be:
 
 ```bash
-docker compose --env-file app.env down
+./capnatix.sh stop
 sudo tar czf capnatix-data-$(date +%F).tar.gz /data/capnatix
-docker compose --env-file app.env up -d
+./capnatix.sh start
 ```
 
-## What's next
-
-[First User Setup](/getting-started/first-user-setup/) — create your
-admin account and fund, and log in for the first time.
