@@ -140,18 +140,24 @@ generic approach on top of what Installation set up. The database is
 what actually matters; uploaded files matter too if you're on
 `STORAGE_PROVIDER=local`.
 
-A live database dump, no downtime:
+A live database dump, no downtime — `-T` disables the pseudo-TTY
+`exec` allocates by default, which otherwise injects stray carriage
+returns into a redirected dump:
 
 ```bash
-docker compose --env-file app.env exec postgres \
+docker compose --env-file app.env exec -T postgres \
   pg_dump -U capnatix capnatix > capnatix-$(date +%F).sql
 ```
 
-Or a filesystem-level backup of everything stateful, stack stopped:
+Or a filesystem-level backup of everything stateful, stack stopped.
+`install.sh` created `/data/capnatix` as root, so reading it back needs
+`sudo` too — without it, `tar` silently skips whatever it can't read and
+still exits looking successful, which is a worse failure than an error
+would be:
 
 ```bash
 docker compose --env-file app.env down
-tar czf capnatix-data-$(date +%F).tar.gz /data/capnatix
+sudo tar czf capnatix-data-$(date +%F).tar.gz /data/capnatix
 docker compose --env-file app.env up -d
 ```
 
