@@ -7,10 +7,12 @@ description: 'A closer look at the environment behind a self-hosted Capnatix ins
 with the minimum required edits to `app.env` — a domain and file storage.
 Everything below is the rest of that file, and the infrastructure around
 it: TLS, storage in more depth, scaling, logs, backups, and what the
-opt-in features actually need. In-app settings (branding, SMTP, SSO,
-license) live under **Guide → Instance Configuration** instead, once
-you're logged in — this page is everything you'd otherwise touch before
-that point.
+opt-in features actually need. In-app settings —
+[branding](/guide/instance-configuration/branding/),
+[SMTP](/guide/instance-configuration/smtp/) (which fully replaces the
+`SMTP_*` values here once configured), SSO, license — live under
+**Guide → Instance Configuration** instead, once you're logged in; this
+page is everything you'd otherwise touch before that point.
 
 ## TLS
 

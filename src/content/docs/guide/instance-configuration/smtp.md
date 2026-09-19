@@ -16,8 +16,11 @@ Configure it at **Admin → Master Configuration → Integrations → Email
 - **Host** — required.
 - **From Address** — required.
 - **Port** — optional, defaults to `587`. `465` is treated as implicit
-  SSL; anything else uses STARTTLS. There's no separate TLS-mode toggle —
-  the port you enter decides it.
+  SSL; anything else attempts STARTTLS if the server offers it during
+  the connection handshake. There's no separate TLS-mode toggle and
+  STARTTLS isn't enforced — a relay that doesn't advertise it gets a
+  plaintext connection instead of a failure, so this matters most on a
+  legacy or misconfigured relay, not a mainstream provider.
 - **Username** — optional, defaults to `emailapikey` (the literal
   username ZeptoMail's SMTP relay expects, if that's your provider).
 - **From Name** — optional, defaults to `Capnatix Platform`.
