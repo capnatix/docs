@@ -4,22 +4,23 @@ description: 'The instance-wide Investment Committee roster — and how it actua
 ---
 
 An Investment Committee (IC) member here doesn't have to be a Capnatix
-user at all — this is a standalone roster of people (name + email) who
-can be brought onto a fund's IC, whether or not they ever log in. Someone
-with no Capnatix account can still be added, assigned to meetings, and
-vote through an emailed link, entirely outside the normal login flow.
+user at all — this is a standalone, **instance-wide roster** of people
+(name + email) who can potentially serve on any fund's IC, whether or not
+they ever log in. Being on this roster alone doesn't put anyone on a
+fund's IC, though: it just makes them selectable. Someone with no
+Capnatix account can still end up voting on a deal — but only after two
+more steps, below.
 
 Configure it at **Admin → Master Configuration → IC Members**.
 
 :::note
-This is one of three layers, not the whole picture. This page manages a
-single **instance-wide roster** — everyone who could potentially serve on
-any fund's IC. A fund then explicitly **associates** roster members it
-wants on its own IC, from that fund's own Settings → IC Members page.
-Only once someone is associated with a fund can that fund **assign** them
-to a specific meeting, which is what actually makes them a voter. Adding
-someone here doesn't put them on any fund's IC by itself — it just makes
-them selectable.
+This is one of three layers. A fund must explicitly **associate** a
+roster member with its own IC before that fund can use them at all (from
+that fund's own Settings → IC Members screen — not yet its own page on
+this docs site). Only once associated can that fund **assign** the
+person to a specific meeting, which is what actually makes them a voter,
+sends them an emailed voting-token link, and puts their vote in front of
+the decision engine when the meeting is tallied.
 :::
 
 ## What's in it
@@ -60,12 +61,18 @@ you about anything, because it can't retroactively affect any meeting —
 by design, it only stops that person from being newly selectable.
 
 Removing a fund's *association* with someone (from that fund's own
-Settings → IC Members page, not this one) is different: it's a real
+Settings → IC Members screen, not this one) is different: it's a real
 removal of that fund's link to them, and it does check first — if the
-person is assigned to any upcoming, not-yet-locked meeting for that fund,
-you'll see a warning listing those meetings before you confirm. The
-removal itself is never blocked, though, even if they're on an upcoming
-meeting; the check is there to inform the decision, not prevent it.
+person is assigned to any upcoming meeting that hasn't yet been locked
+(locking a meeting freezes its member list and voting), you'll see a
+warning listing those meetings before you confirm.
+
+:::caution
+That warning is informational only — the removal is never actually
+blocked, even if it lists an upcoming meeting the person is still
+assigned to. It's on you to cancel and reconsider after reading it; the
+system won't stop you.
+:::
 
 ## Who can do what
 
