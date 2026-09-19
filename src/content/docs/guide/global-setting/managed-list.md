@@ -45,13 +45,17 @@ validation is that the value can't already exist in that category
 
 Removing a value never touches data that already used it — existing
 records keep whatever string was already stored, they just won't be
-offered as a dropdown option going forward. For most Company-group
-categories (Company Type, Industry, Company Stage, Sector, and others in
-that group), you can instead **replace** a value as you remove it, which
-rewrites every existing record using the old value to the new one
-instead of leaving it orphaned. Categories outside that group — Currency,
-security types, investor fields — don't support that rewrite; removing a
-value there only removes the option itself.
+offered as a dropdown option going forward. For some Company-group
+categories (Company Type and Industry among them), you can instead
+**replace** a value as you remove it, which rewrites every existing
+record using the old value to the new one instead of leaving it
+orphaned — but not every category in that same group supports it (Contact
+Role, for one, doesn't). The page doesn't distinguish the two: the
+replace option is offered for every category regardless, and silently
+does nothing to existing records when the category underneath doesn't
+actually support it — no error, no warning. If you're relying on the
+replace step, verify the rewrite actually happened rather than trusting
+the UI went through with it.
 
 **Currency is a special case**: you can't remove one that's still in use
 by any fund, company, or funding round — the removal is blocked outright
@@ -59,17 +63,23 @@ rather than left to a replace step.
 
 ## Who can do what
 
-Reaching this admin page at all requires an instance admin. Underneath
-that, the add/remove actions themselves are gated separately: a Fund
-Admin can remove values, and a Deal Lead or Sourcing Analyst can add
-them (from the quick-add option where these fields appear while editing
-a company, not from this page) — so values can grow from day-to-day use
-across funds, even though only an instance admin ever sees this
-consolidated view of all of them.
+Reaching this admin page itself requires an instance admin — that's a
+UI-level gate, not a difference in what the underlying data allows.
+Adding and removing values is checked separately, per action, against
+whatever fund-level roles a user holds — **anywhere**, not the fund
+whose data you're currently touching. A Fund Admin of one small fund can
+remove or replace a Currency or Company Type value that every other
+fund's data also depends on; a Deal Lead or Sourcing Analyst on one fund
+can add a new value while editing a company that belongs to a different
+fund entirely, via the quick-add option where these fields appear
+in-context (not from this page). Treat any of those roles, on any single
+fund, as enough to reach every category here — because it is.
 
 :::caution
-Two categories exist in this list but don't actually drive the dropdown
-their name suggests: **Investor Status** and the **Fund Type** field on
-Fund Setup are both hardcoded in the app, not read from here. Editing
-either one on this page has no visible effect anywhere.
+**Investor Status** exists as a category here, and the page's own copy
+says changes apply immediately everywhere that list is used — but the
+actual investor status dropdown is hardcoded elsewhere in the app and
+never reads from this list at all. Editing it here has no visible effect
+anywhere. This is a real gap in the product, not a documentation nuance
+— tracked separately, not something to work around here.
 :::
