@@ -55,7 +55,14 @@ export default defineConfig({
             },
             {
               label: 'Global Setting',
-              items: [{ label: 'Managed List', link: '/guide/global-setting/managed-list/' }],
+              items: [
+                { label: 'Date/Time', link: '/guide/global-setting/date-time/' },
+                { label: 'Managed List', link: '/guide/global-setting/managed-list/' },
+                { label: 'Email Templates', link: '/guide/global-setting/email-templates/' },
+                { label: 'Custom Fields', link: '/guide/global-setting/custom-fields/' },
+                { label: 'IC Members', link: '/guide/global-setting/ic-members/' },
+                { label: 'Trash', link: '/guide/global-setting/trash/' },
+              ],
             },
             {
               label: 'User Management',
