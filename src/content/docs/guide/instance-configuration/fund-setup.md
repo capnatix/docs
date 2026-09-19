@@ -3,9 +3,12 @@ title: 'Fund Setup'
 description: 'Create, edit, and delete funds from Admin — each one scopes its own companies, investors, and reports.'
 ---
 
-A **fund** is the scoping unit for everything else in Capnatix — companies,
-investors, transactions, and reports all belong to exactly one fund. Manage
-them from **Admin → Master Configuration → Funds**.
+Every company you track, every investor relationship, every report you
+generate — all of it lives inside a fund. It's the first thing to set up,
+and everything else in Capnatix depends on it. Get the name right up
+front: it generates a permanent code you can't change later.
+
+Manage funds from **Admin → Master Configuration → Funds**.
 
 ## Creating a fund
 
