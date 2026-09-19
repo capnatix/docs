@@ -123,6 +123,16 @@ export default defineConfig({
           tag: 'link',
           attrs: { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
         },
+        // Arrow-key navigation for search results -- @pagefind/default-ui
+        // (the widget Starlight's own Search.astro wires up unmodified)
+        // has none built in. Global, not page-scoped, since search opens
+        // from every page's header. See the script's own header comment
+        // for why this is a small separate file rather than a fork of
+        // Search.astro.
+        {
+          tag: 'script',
+          attrs: { src: '/assets/search-keynav.js', defer: true },
+        },
       ],
     }),
   ],
