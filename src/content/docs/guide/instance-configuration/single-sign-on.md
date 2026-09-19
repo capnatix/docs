@@ -30,6 +30,19 @@ as two independent setups, not one form with a provider switch.
   shown read-only. Add it to your Google Cloud app's authorized redirect
   URIs; you don't set it yourself.
 
+**Setup steps**, in [Google Cloud Console](https://console.cloud.google.com/apis/credentials):
+
+1. Open **APIs & Services → Credentials**.
+2. **Create Credentials → OAuth client ID**, application type **Web
+   application**.
+3. Add the Redirect URI above to the app (platform: **Web**).
+4. Enable the **Gmail API** (APIs & Services → Library → Gmail API).
+5. On the **OAuth consent screen**, add the scopes: `openid`, `email`,
+   `profile`, and `gmail.readonly`.
+6. Copy the **Client ID** and **Client secret** into the form, and set
+   your Workspace domain (the app's own hint calls this step optional —
+   it isn't; Google won't turn on without it).
+
 ## Microsoft 365
 
 - **Client ID** and **Client Secret** — from your Microsoft Entra (Azure
@@ -40,6 +53,18 @@ as two independent setups, not one form with a provider switch.
 - **Redirect URI** — `<your instance URL>/api/auth/oauth/microsoft/callback`
   — a **different URL from Google's**, shown read-only. Add it to your
   Entra app registration.
+
+**Setup steps**, in [Microsoft Entra admin center](https://entra.microsoft.com):
+
+1. Open **App registrations → New registration**.
+2. Add the Redirect URI above to the app (platform: **Web**).
+3. **API permissions → Add a permission → Microsoft Graph → Delegated**:
+   add `openid`, `email`, `profile`, `Mail.Read`, and `offline_access`.
+4. **Certificates & secrets → New client secret** — copy the secret
+   *value* immediately; Microsoft won't show it again.
+5. From **Overview**, copy the **Application (client) ID** and
+   **Directory (tenant) ID**.
+6. Paste the Client ID, secret, and Tenant ID into the form.
 
 For either provider, saving with the provider turned on only requires
 the Client ID and the domain/tenant restriction — it doesn't block you
