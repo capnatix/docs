@@ -13,7 +13,7 @@ Configure it at **Admin → Master Configuration → Date/Time**.
 
 ## What's in it
 
-- **Timezone** — a searchable list of every IANA timezone the server
+- **Timezone** — a searchable list of every IANA timezone your browser
   recognizes (hundreds of them, not a short list), each shown with its
   current UTC offset. Default is `Asia/Kolkata`. Whatever you pick is
   normalized to its canonical name on save — for example, selecting the
@@ -47,14 +47,17 @@ scope is below.
 
 In practice, both settings now drive most dates you see in the product:
 report builder previews and exports, kanban deal cards, deal list columns,
-investor tables and profiles, IC meeting prep, and the transaction report,
-among others.
+investor profiles, IC meeting prep, and the transaction report, among
+others.
 
-A small number of screens are **deliberately** left out because they're
-system, audit, or vendor-metadata surfaces rather than fund data: Single
-Sign-On, SMTP, Trash, Users, session locks, the public application form,
-the top bar, and license pages all keep their own fixed or browser-local
-date formatting on purpose.
+The two settings don't always travel together, though. System, audit, and
+vendor-metadata surfaces — Single Sign-On, SMTP, Trash, Users, session
+locks, the public application form, and license pages — **do** follow
+your configured timezone, but **deliberately** keep their own fixed date
+layout rather than the four-preset date format; that's a narrower, and
+intentional, exclusion than it might look like at a glance. The top bar's
+notification timestamps are different again: those show relative time
+("2h ago"), so neither setting applies there at all.
 
 A few other spots aren't on that intentional-exclusion list but still
 don't follow the setting — most likely missed rather than deliberate,
