@@ -8,8 +8,9 @@ team and your investors are waiting on — all of it leaves through here.
 Skip this and none of it actually breaks; it just goes quiet, logged to
 a server console nobody's watching instead of landing in an inbox.
 
-Configure it at **Admin → Master Configuration → Integrations → Email
-(SMTP)**.
+Configure it at **Admin → Integrations → Email (SMTP)** — a separate
+top-level section from Master Configuration, alongside Single Sign-On
+and AI Configuration.
 
 ## Fields
 

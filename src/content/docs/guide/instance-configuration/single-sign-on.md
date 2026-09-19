@@ -9,34 +9,51 @@ create, remember, or eventually leak. It's additive, not a replacement:
 password login keeps working for everyone who already has one, exactly
 as before.
 
-Configure it at **Admin → Master Configuration → Integrations →
-Single Sign-On**.
+Configure it at **Admin → Integrations → Single Sign-On** — a separate
+top-level section from Master Configuration, alongside Email (SMTP) and
+AI Configuration.
 
 Despite the name, this is specifically **Google Workspace and Microsoft
 365 sign-in** (OpenID Connect) — not SAML, and not a generic OIDC issuer
-you can point at any identity provider.
+you can point at any identity provider. Google and Microsoft each get
+their own tab, their own fields, and their own redirect URI — treat them
+as two independent setups, not one form with a provider switch.
 
-## Fields (per provider)
+## Google Workspace
 
-- **Client ID** and **Client Secret** — from your Google/Microsoft app
-  registration. The secret is write-only and encrypted at rest, the same
-  way the SMTP password is — the field always looks empty even after
-  you've saved one.
-- **Allowed Domain** (Google) / **Tenant ID** (Microsoft) — required.
-  This is what actually restricts sign-in to your own organization;
-  there's no open or multi-tenant mode.
-- **Redirect URI** — shown read-only, derived from `INF_FRONTEND_URL`.
-  Copy this into your app registration; you don't set it yourself.
+- **Client ID** and **Client Secret** — from your Google Cloud OAuth app.
+  The secret is write-only and encrypted at rest, the same way the SMTP
+  password is — the field always looks empty even after you've saved one.
+- **Allowed Domain** — required to turn Google on. Restricts sign-in to
+  one Google Workspace domain; there's no open sign-in mode.
+- **Redirect URI** — `<your instance URL>/api/auth/oauth/google/callback`,
+  shown read-only. Add it to your Google Cloud app's authorized redirect
+  URIs; you don't set it yourself.
 
-Both a Client ID/Secret and the domain/tenant restriction are required
-before you can turn the provider on.
+## Microsoft 365
+
+- **Client ID** and **Client Secret** — from your Microsoft Entra (Azure
+  AD) app registration. Same write-only, encrypted-at-rest handling as
+  Google's.
+- **Tenant ID** — required to turn Microsoft on. Restricts sign-in to one
+  Azure tenant; there's no open or multi-tenant sign-in mode.
+- **Redirect URI** — `<your instance URL>/api/auth/oauth/microsoft/callback`
+  — a **different URL from Google's**, shown read-only. Add it to your
+  Entra app registration.
+
+For either provider, saving with the provider turned on only requires
+the Client ID and the domain/tenant restriction — it doesn't block you
+from saving without a Client Secret. Sign-in itself won't actually work
+until a secret is set, though, so treat all three as required in
+practice.
 
 ## Test connection
 
-Checks that your Client ID and Secret are valid by probing the
-provider's own token endpoint — it doesn't perform a real sign-in, and
-works even before you've enabled the provider, so you can verify
-credentials before going live.
+Checks that your **already-saved** Client ID and Secret are valid, by
+probing the provider's own token endpoint — it doesn't perform a real
+sign-in, and works even before you've enabled the provider. Save first:
+this tests what's on file, not whatever you've just typed into the form
+but haven't saved yet.
 
 ## New users and roles
 
