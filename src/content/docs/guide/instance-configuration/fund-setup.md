@@ -12,10 +12,11 @@ them from **Admin → Master Configuration → Funds**.
 Click **Add New Fund** and fill in:
 
 - **Fund Name** — the only required field.
-- **Fund Slug** — not a field you fill in; a 3-character code is generated
-  automatically from the name as you type, and shown as a preview.
-  It appears in every URL for this fund and **cannot be changed later**.
-  The rule:
+- **Fund Slug** — not a field you fill in, and not shown as a live preview
+  while you type either; a 3-character code is generated automatically
+  from the name the moment you create the fund, and you'll see it
+  afterward (on the fund's own edit view). It appears in every URL for
+  this fund and **cannot be changed later**. The rule:
   - **Three or more words** → the first letter of the first three words
     (`IAN Angel Network` → `IAN`, `Local Dev Fund` → `LDF`).
   - **One or two words** → the words joined together and cut to 3
@@ -58,8 +59,8 @@ templates, and more) is deleted along with it automatically.
 
 :::caution
 If the fund still has companies, transactions, or discussions attached
-through certain older data paths, deletion can fail with a raw
-database error instead of a clear "this fund still has data" message.
-If that happens, it isn't safe to assume the fund — or its data — was
-left untouched; check before retrying.
+through certain older data paths, deletion can fail with a raw database
+error instead of a clear "this fund still has data" message. It's safe
+either way — a failed delete rolls back completely, so nothing is left
+half-deleted — but the error itself won't tell you what to fix.
 :::
