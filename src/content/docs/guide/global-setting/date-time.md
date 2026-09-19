@@ -53,9 +53,12 @@ others.
 The two settings don't always travel together, though. System, audit, and
 vendor-metadata surfaces — Single Sign-On, SMTP, Trash, Users, session
 locks, the public application form, and license pages — **do** follow
-your configured timezone, but **deliberately** keep their own fixed date
-layout rather than the four-preset date format; that's a narrower, and
-intentional, exclusion than it might look like at a glance. The top bar's
+your configured timezone, but deliberately keep their own fixed date
+layout rather than the four-preset date format. Trash is a partial
+exception worth knowing about: it's the one screen among those that
+doesn't pin a fixed layout at all — a pre-existing quirk, not a new one,
+so its timestamps still vary by each viewer's own browser locale even
+though the timezone itself is correctly pinned. The top bar's
 notification timestamps are different again: those show relative time
 ("2h ago"), so neither setting applies there at all.
 
