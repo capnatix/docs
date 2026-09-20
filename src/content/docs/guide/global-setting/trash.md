@@ -25,29 +25,32 @@ funds it's currently in:
   Closed instead.
 
 :::note
-There's a second, unrelated "soft delete" in Capnatix — removing a deal
-from a fund's Kanban view via its own delete action just hides it into
-that fund's Archive/Watchlist bucket (a `display` flag). That's a
-completely different mechanism from Trash and doesn't touch the
+There's a second, unrelated way a deal can disappear from a fund's active
+board — moving it into that fund's Archive or Watchlist bucket. That's
+just a stage change (the deal's `fund_companies` row points at a
+different stage), not a delete of any kind, and it doesn't touch the
 `deleted_at` column this page reads. Only the "last fund" removal
-described above lands a deal here.
+described above lands a deal in Trash.
 :::
 
 ## Restoring
 
 Restore puts a deal back exactly where it was — same fund, same stage,
-same everything. Trashing and restoring only ever flip two columns on the
-company record; nothing about the deal itself (stage, custom fields,
-contacts, documents, discussions) is touched by either action, so there's
-nothing to reconstruct.
+same everything. Trashing and restoring only ever touch a handful of
+bookkeeping columns on the company record (when it was deleted, by whom,
+and when it was last updated); nothing about the deal itself (stage,
+custom fields, contacts, documents, discussions) is touched by either
+action, so there's nothing to reconstruct.
 
 :::caution
 That guarantee depends on the fund itself still existing. If the fund a
 deal was trashed from is later deleted while the deal is still sitting in
 Trash, restoring it still "succeeds" — but the deal comes back with no
-fund link at all. It won't appear on any fund's board, since every list
-view is reached through a fund link, and you'd need to manually add it to
-a fund again to make it visible anywhere.
+fund link at all, and nothing errors or warns you. It won't appear on any
+fund's board, since every list view is reached through a fund link, and
+you'd need to know to manually add it to a fund again to make it visible
+anywhere. This is a real gap, tracked as INVOS-934, not expected
+behavior to plan around.
 :::
 
 :::caution
@@ -70,6 +73,13 @@ rather than removed outright — and the IC Portal that external committee
 members use to review a meeting keeps showing it too, since a past
 meeting's record is meant to stay intact regardless of what happens to
 the deal afterward.
+
+One more thing worth knowing if you're comparing timestamps here across
+different viewers: this page is the one exception among Capnatix's
+system/audit screens where the deleted-at date doesn't use a fixed
+layout — it renders in each viewer's own browser locale rather than a
+consistent format (see the [Date/Time](/guide/global-setting/date-time/)
+page for the full picture on this).
 
 ## Who can do what
 
