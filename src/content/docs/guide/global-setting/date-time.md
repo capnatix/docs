@@ -35,15 +35,13 @@ exist at all.
 
 ## Where it actually applies
 
-:::caution
-The Date/Time page's own on-screen help text says this only affects report
-builder exports (Excel/CSV) and that "screen dates elsewhere in the app
-still follow each viewer's own browser timezone." That was true when the
-page first shipped, but a follow-up change the next day wired the setting
-into most of the app's own date displays without the help text being
-updated to match — the in-app copy is stale. Don't rely on it; the real
-scope is below.
-:::
+> *The Date/Time page's own on-screen help text says this only affects
+> report builder exports (Excel/CSV) and that "screen dates elsewhere in
+> the app still follow each viewer's own browser timezone." That was
+> true when the page first shipped, but a follow-up change the next day
+> wired the setting into most of the app's own date displays without the
+> help text being updated to match — the in-app copy is stale. Don't
+> rely on it; the real scope is below.*
 
 In practice, both settings now drive most dates you see in the product:
 report builder previews and exports, kanban deal cards, deal list columns,

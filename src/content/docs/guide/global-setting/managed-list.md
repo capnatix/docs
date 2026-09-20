@@ -11,13 +11,11 @@ single fund's own settings.
 
 Configure it at **Admin → Master Configuration → Managed Lists**.
 
-:::note
-There's a second, unrelated feature that also gets called "managed
-lists" — the tags/labels you attach to companies and investors from
-inside a fund. That one lives on the fund itself and has nothing to do
-with this page. This page is instance-wide dropdown options; that one is
-per-fund labeling.
-:::
+> *There's a second, unrelated feature that also gets called "managed
+> lists" — the tags/labels you attach to companies and investors from
+> inside a fund. That one lives on the fund itself and has nothing to do
+> with this page. This page is instance-wide dropdown options; that one
+> is per-fund labeling.*
 
 ## What's in it
 
@@ -75,11 +73,10 @@ fund entirely, via the quick-add option where these fields appear
 in-context (not from this page). Treat any of those roles, on any single
 fund, as enough to reach every category here — because it is.
 
-:::caution
-**Investor Status** exists as a category here, and the page's own copy
-says changes apply immediately everywhere that list is used — but the
-actual investor status dropdown is hardcoded elsewhere in the app and
-never reads from this list at all. Editing it here has no visible effect
-anywhere. This is a real gap in the product, not a documentation nuance
-— tracked separately, not something to work around here.
-:::
+> ***Investor Status*** *exists as a category here, and the page's own
+> copy says changes apply immediately everywhere that list is used — but
+> the actual investor status dropdown is hardcoded elsewhere in the app
+> and never reads from this list at all. Editing it here has no visible
+> effect anywhere. This is a real gap in the product, not a
+> documentation nuance — a known issue, not something to work around
+> here.*

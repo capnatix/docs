@@ -44,9 +44,7 @@ permission that reaches this page.
 - **Link previews** — when someone shares a link to your instance, the
   title and preview image come from here.
 
-:::note
-It does **not** appear in the authenticated app's own header once you're
-logged in — that shows the current fund's own logo instead, a separate
-setting on the fund itself. Instance branding also isn't included in
-Excel exports.
-:::
+> *It does not appear in the authenticated app's own header once you're
+> logged in — that shows the current fund's own logo instead, a
+> separate setting on the fund itself. Instance branding also isn't
+> included in Excel exports.*
