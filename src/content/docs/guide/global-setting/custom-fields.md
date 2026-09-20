@@ -11,13 +11,12 @@ available everywhere a company shows up, from Sourcing through Portfolio.
 
 Configure it at **Admin → Master Configuration → Custom Fields**.
 
-:::note
-There's a similarly-named but unrelated feature — **Settings → Asset
-Types**' "custom columns" — that lets a fund add extra text/number/date
-columns to its own transaction tables, scoped to one asset type (Equity,
-Debt, Gold) in that one fund, purely for data capture and never used in
-any calculation. That's a completely different system from this page.
-:::
+> _There's a similarly-named but unrelated feature — **Settings → Asset
+> Types**' "custom columns" — that lets a fund add extra text/number/date
+> columns to its own transaction tables, scoped to one asset type
+> (Equity, Debt, Gold) in that one fund, purely for data capture and
+> never used in any calculation. That's a completely different system
+> from this page._
 
 ## What's in it
 
@@ -78,17 +77,15 @@ company's edit view still shows it, appended as an extra option outside
 the maintained list, rather than silently blanking it. It'll look out of
 place, though, until someone manually reselects a real option.
 
-:::caution
-Nothing stops you from creating a custom field whose key collides with a
-handful of reserved names Capnatix already uses in the same underlying
-storage — `country`, `state`, `short_description`, and `__layout` (used
-internally for field ordering). Doing so won't error; it'll silently
-corrupt that system value instead. Avoid those four as custom field keys
-specifically — in practice this means avoiding labels like "Country" or
-"State" that would auto-generate one of those keys. This is a real gap
-in the product, not a documentation nuance — tracked as INVOS-899, not
-something to work around here.
-:::
+> *Nothing stops you from creating a custom field whose key collides
+> with a handful of reserved names Capnatix already uses in the same
+> underlying storage — `country`, `state`, `short_description`, and
+> `__layout` (used internally for field ordering). Doing so won't error;
+> it'll silently corrupt that system value instead. Avoid those four as
+> custom field keys specifically — in practice this means avoiding
+> labels like "Country" or "State" that would auto-generate one of those
+> keys. This is a real gap in the product, not a documentation nuance,
+> not something to work around here.*
 
 ## Who can do what
 
@@ -103,6 +100,5 @@ Setting a field's **value** on a specific company is different: any fund
 member with edit access to that company's profile can fill it in — the
 same permission that lets them edit the company's other profile fields,
 and that check is enforced server-side. A field marked "Required" is a
-separate check, and a weaker one: it's only enforced in the browser
-(tracked as INVOS-899), so a direct API call can still save the company
-with that field left empty.
+separate check, and a weaker one: it's only enforced in the browser, so
+a direct API call can still save the company with that field left empty.

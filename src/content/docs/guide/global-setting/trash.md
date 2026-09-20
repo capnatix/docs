@@ -24,14 +24,12 @@ funds it's currently in:
   fund at all — the action is blocked outright, with guidance to mark it
   Closed instead.
 
-:::note
-There's a second, unrelated way a deal can disappear from a fund's active
-board — moving it into that fund's Archive or Watchlist bucket. That's
-just a stage change (the deal's `fund_companies` row points at a
-different stage), not a delete of any kind, and it doesn't touch the
-`deleted_at` column this page reads. Only the "last fund" removal
-described above lands a deal in Trash.
-:::
+> *There's a second, unrelated way a deal can disappear from a fund's
+> active board — moving it into that fund's Archive or Watchlist bucket.
+> That's just a stage change (the deal's `fund_companies` row points at
+> a different stage), not a delete of any kind, and it doesn't touch the
+> `deleted_at` column this page reads. Only the "last fund" removal
+> described above lands a deal in Trash.*
 
 ## Restoring
 
@@ -42,26 +40,22 @@ and when it was last updated); nothing about the deal itself (stage,
 custom fields, contacts, documents, discussions) is touched by either
 action, so there's nothing to reconstruct.
 
-:::caution
-That guarantee depends on the fund itself still existing. If the fund a
-deal was trashed from is later deleted while the deal is still sitting in
-Trash, restoring it still "succeeds" — but the deal comes back with no
-fund link at all, and nothing errors or warns you. It won't appear on any
-fund's board, since every list view is reached through a fund link, and
-you'd need to know to manually add it to a fund again to make it visible
-anywhere. This is a real gap, tracked as INVOS-934, not expected
-behavior to plan around.
-:::
+> *That guarantee depends on the fund itself still existing. If the fund
+> a deal was trashed from is later deleted while the deal is still
+> sitting in Trash, restoring it still "succeeds" — but the deal comes
+> back with no fund link at all, and nothing errors or warns you. It
+> won't appear on any fund's board, since every list view is reached
+> through a fund link, and you'd need to know to manually add it to a
+> fund again to make it visible anywhere. This is a real gap, not
+> expected behavior to plan around.*
 
-:::caution
-The subtitle on this page, and the toast you see when a deal is trashed,
-both say "recoverable for 30 days." In practice nothing enforces that —
-there's no scheduled job that purges or expires anything sitting in
-Trash. A trashed deal stays here indefinitely until someone manually
-restores it. This is a real gap between what the product says and what
-it does, tracked as INVOS-929, not something to plan around as if a
-30-day window actually exists.
-:::
+> *The subtitle on this page, and the toast you see when a deal is
+> trashed, both say "recoverable for 30 days." In practice nothing
+> enforces that — there's no scheduled job that purges or expires
+> anything sitting in Trash. A trashed deal stays here indefinitely
+> until someone manually restores it. This is a real gap between what
+> the product says and what it does, not something to plan around as if
+> a 30-day window actually exists.*
 
 ## While a deal is in Trash
 

@@ -58,10 +58,8 @@ for sending replies, those go out through that person's own account via
 Google/Microsoft directly — never through this SMTP config, configured
 or not.
 
-:::caution
-If SMTP is never configured, most transactional email doesn't fail —
-it silently logs to the server console instead of sending, with no error
-anywhere in the app. An invite or password-reset email that "never
-arrived" is the first symptom most people actually notice. Set this up
-before you invite anyone.
-:::
+> *If SMTP is never configured, most transactional email doesn't fail —
+> it silently logs to the server console instead of sending, with no
+> error anywhere in the app. An invite or password-reset email that
+> "never arrived" is the first symptom most people actually notice. Set
+> this up before you invite anyone.*

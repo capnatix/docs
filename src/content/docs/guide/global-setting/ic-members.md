@@ -13,15 +13,14 @@ more steps, below.
 
 Configure it at **Admin → Master Configuration → IC Members**.
 
-:::note
-This is one of three layers. A fund must explicitly **associate** a
-roster member with its own IC before that fund can use them at all (from
-that fund's own Settings → IC Members screen — not yet its own page on
-this docs site). Only once associated can that fund **assign** the
-person to a specific meeting, which is what actually makes them a voter,
-sends them an emailed voting-token link, and puts their vote in front of
-the decision engine when the meeting is tallied.
-:::
+> _This is one of three layers. A fund must explicitly **associate** a
+> roster member with its own IC before that fund can use them at all
+> (from that fund's own Settings → IC Members screen — not yet its own
+> page on this docs site). Only once associated can that fund
+> **assign** the person to a specific meeting, which is what actually
+> makes them a voter, sends them an emailed voting-token link, and puts
+> their vote in front of the decision engine when the meeting is
+> tallied._
 
 ## What's in it
 
@@ -67,12 +66,10 @@ person is assigned to any upcoming meeting that hasn't yet been locked
 (locking a meeting freezes its member list and voting), you'll see a
 warning listing those meetings before you confirm.
 
-:::caution
-That warning is informational only — the removal is never actually
-blocked, even if it lists an upcoming meeting the person is still
-assigned to. It's on you to cancel and reconsider after reading it; the
-system won't stop you.
-:::
+> *That warning is informational only — the removal is never actually
+> blocked, even if it lists an upcoming meeting the person is still
+> assigned to. It's on you to cancel and reconsider after reading it;
+> the system won't stop you.*
 
 ## Who can do what
 

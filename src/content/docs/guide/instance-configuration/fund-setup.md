@@ -43,9 +43,7 @@ Creating a fund also seeds it with a default deal-pipeline stage list,
 default watchlist/archive reasons, and the standard email templates — and
 adds you to it as a **Fund Admin**, so you have full access immediately.
 
-:::note
-How many funds you can create is capped by your license.
-:::
+> *How many funds you can create is capped by your license.*
 
 ## Editing a fund
 
@@ -60,10 +58,9 @@ archive step today — this is a permanent delete, not a soft-delete you can
 reverse. Most of a fund's data (pipeline stages, users, labels, email
 templates, and more) is deleted along with it automatically.
 
-:::caution
-If the fund still has companies, transactions, or discussions attached
-through certain older data paths, deletion can fail with a raw database
-error instead of a clear "this fund still has data" message. It's safe
-either way — a failed delete rolls back completely, so nothing is left
-half-deleted — but the error itself won't tell you what to fix.
-:::
+> *If the fund still has companies, transactions, or discussions
+> attached through certain older data paths, deletion can fail with a
+> raw database error instead of a clear "this fund still has data"
+> message. It's safe either way — a failed delete rolls back
+> completely, so nothing is left half-deleted — but the error itself
+> won't tell you what to fix.*
