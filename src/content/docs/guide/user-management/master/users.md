@@ -4,11 +4,13 @@ description: 'The instance-wide account list — adding, deactivating, and the r
 ---
 
 This is every user account on the instance, regardless of which fund (if
-any) they belong to — fund membership is separate data, managed mostly
-from a fund's own user page. What you set here is each person's account
-status and their **global** admin flag; per-fund roles live on
-[Fund Roles](/guide/user-management/master/roles/) and are assigned per
-fund, not from this page.
+any) they belong to — fund membership is separate data, mostly managed
+from a fund's own user page rather than here. What you always set here is
+each person's account status and their **global** admin flag; per-fund
+role assignment (which templates from [Fund
+Roles](/guide/user-management/master/roles/) someone holds) is usually a
+fund-page action too, with one exception — adding a brand-new user (below)
+does it inline, in the same step.
 
 Configure it at **Admin → User Management → Users**.
 
@@ -29,8 +31,9 @@ receive it.
 
 **Editing** a user lets you change their name, global Role, and Active/
 Inactive status — but not their fund memberships or role templates; that
-still happens on the fund's own page. You can't edit your own row from
-here.
+still happens on the fund's own page. The Edit button is disabled on your
+own row — that's a browser-side guard rather than something the server
+also enforces, so treat it as guidance, not a hard boundary.
 
 **Reset Password** generates a new temporary password, emails it, forces
 a password change on next login, and immediately invalidates that

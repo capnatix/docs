@@ -31,8 +31,10 @@ those four. Every template — built-in or custom — is configured the same
 way: a name, a description, and a set of capability grants (View, Add,
 Edit, Delete) walked across the full permission tree, node by node.
 Templates don't specify which fund they apply to; that binding happens
-per-member, from inside a specific fund's own user management page, not
-here.
+per-member, usually from inside a specific fund's own user management
+page rather than here — except when a brand-new user is created from
+[Users](/guide/user-management/master/users/), which assigns their first
+fund and template in the same step.
 
 ## How a template actually takes effect
 
@@ -48,7 +50,9 @@ Admin's permissions immutable, only undeletable (below).
 
 A member can also be given a one-off permission override that replaces
 their template's grants entirely for that one person — that override, if
-one exists, isn't visible or editable from this page at all.
+one exists, isn't visible or editable from this page at all (fund-level
+user management isn't written up on this docs site yet, so there's
+nowhere else to point you to for it today, either).
 
 ## Removing a template
 

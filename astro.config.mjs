@@ -70,7 +70,7 @@ export default defineConfig({
                 {
                   label: 'Master',
                   items: [
-                    { label: 'Roles', link: '/guide/user-management/master/roles/' },
+                    { label: 'Fund Roles', link: '/guide/user-management/master/roles/' },
                     { label: 'Users', link: '/guide/user-management/master/users/' },
                   ],
                 },
