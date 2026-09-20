@@ -47,16 +47,14 @@ right away. There's a second path — inviting a new email address
 directly from a fund's own user page — that behaves differently for a
 first-time invite:
 
-:::caution
-Inviting a brand-new email address from a fund's own user page creates
-the account as **Pending**, not Active — but sends the exact same "here's
-your temporary password, log in" email that Admin → Users sends for an
-account that actually can. The invited person can't sign in with that
-password until an instance admin comes here and flips their status to
-Active. Until then, following the email's own instructions just fails.
-This is a real gap between the two invite paths, tracked as INVOS-943,
-not expected behavior to work around by guessing at it.
-:::
+> *Inviting a brand-new email address from a fund's own user page creates
+> the account as **Pending**, not Active — but sends the exact same
+> "here's your temporary password, log in" email that Admin → Users
+> sends for an account that actually can. The invited person can't sign
+> in with that password until an instance admin comes here and flips
+> their status to Active. Until then, following the email's own
+> instructions just fails. This is a known gap between the two invite
+> paths, not expected behavior to work around by guessing at it.*
 
 Inviting someone whose email **already exists** as a user, from either
 path, doesn't create a duplicate account — the existing user is looked up
@@ -71,13 +69,11 @@ changes: their fund memberships and role assignments stay exactly as
 they were, just dormant, and reactivating them restores full access with
 no need to reassign anything.
 
-:::caution
-Your license caps how many *active* users you can have, and Add User
-correctly blocks you once you're at that cap. Reactivating someone,
-though, doesn't check the cap at all — you can bring a deactivated user
-back regardless of how many active seats your license allows, with no
-warning that you've gone over. Tracked as INVOS-944.
-:::
+> *Your license caps how many active users you can have, and Add User
+> correctly blocks you once you're at that cap. Reactivating someone,
+> though, doesn't check the cap at all — you can bring a deactivated
+> user back regardless of how many active seats your license allows,
+> with no warning that you've gone over.*
 
 Deleting a user is a completely different, and permanent, action —
 there's no recovery, no Trash. It also cascades: every one of that
@@ -86,14 +82,12 @@ deleting someone doesn't just end their access, it erases the record of
 which funds and roles they ever had. You can't delete yourself or the
 instance's last remaining active admin.
 
-:::caution
-Deactivate and Delete read like two strengths of the same action, but
-they aren't. Deactivating is the reversible, "pause this person" option
-and preserves everything. Deleting is irreversible and destroys their
-fund-membership history along with the account. If you're not certain,
-deactivate — you can always delete later, but never the other way
-around.
-:::
+> *Deactivate and Delete read like two strengths of the same action, but
+> they aren't. Deactivating is the reversible, "pause this person"
+> option and preserves everything. Deleting is irreversible and destroys
+> their fund-membership history along with the account. If you're not
+> certain, deactivate — you can always delete later, but never the other
+> way around.*
 
 ## Who can do what
 
