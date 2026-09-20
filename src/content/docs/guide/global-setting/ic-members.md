@@ -13,14 +13,14 @@ more steps, below.
 
 Configure it at **Admin → Master Configuration → IC Members**.
 
-> *This is one of three layers. A fund must explicitly **associate** a
+> _This is one of three layers. A fund must explicitly **associate** a
 > roster member with its own IC before that fund can use them at all
 > (from that fund's own Settings → IC Members screen — not yet its own
 > page on this docs site). Only once associated can that fund
 > **assign** the person to a specific meeting, which is what actually
 > makes them a voter, sends them an emailed voting-token link, and puts
 > their vote in front of the decision engine when the meeting is
-> tallied.*
+> tallied._
 
 ## What's in it
 

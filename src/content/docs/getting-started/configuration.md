@@ -62,13 +62,11 @@ docker compose -f docker-compose.yaml -f docker-compose.tls.yaml \
 Caddy reaches the `proxy` service directly over the compose network
 (`proxy:80`), regardless of what `PROXY_PORT` is set to.
 
-:::note
-`./capnatix.sh start`/`stop` only know about the single
-`docker-compose.yaml` `install` gave you. Once you're running with the
-TLS override layered on top, use the two-file `docker compose -f ... -f
-...` form above directly instead — `capnatix.sh` won't pick up the
-override on its own.
-:::
+> _`./capnatix.sh start`/`stop` only know about the single
+> `docker-compose.yaml` `install` gave you. Once you're running with the
+> TLS override layered on top, use the two-file `docker compose -f ... -f
+> ...` form above directly instead — `capnatix.sh` won't pick up the
+> override on its own._
 
 ## File storage
 
@@ -85,12 +83,11 @@ region if you're on S3. `azure` is a separate provider option with its
 own `AZURE_STORAGE_CONNECTION_STRING`/`AZURE_STORAGE_CONTAINER` pair, not
 read unless `STORAGE_PROVIDER=azure`.
 
-:::note
-`MAX_UPLOAD_SIZE_MB` (default `20`) has a ceiling: the `proxy` container's
-own nginx config caps every request body at 50 MB regardless. Raising
-`MAX_UPLOAD_SIZE_MB` above that has no effect until a custom proxy image
-raises the matching `client_max_body_size` too.
-:::
+> _`MAX_UPLOAD_SIZE_MB` (default `20`) has a ceiling: the `proxy`
+> container's own nginx config caps every request body at 50 MB
+> regardless. Raising `MAX_UPLOAD_SIZE_MB` above that has no effect
+> until a custom proxy image raises the matching `client_max_body_size`
+> too._
 
 ## AI features
 

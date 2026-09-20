@@ -89,15 +89,15 @@ That new account gets the base **user** role and **no fund access** —
 a fund admin still has to grant Editor/Viewer access on the funds they
 need, same as any other new user.
 
-> **If your identity provider ever breaks:** *an account that has only
+> **If your identity provider ever breaks:** _an account that has only
 > ever signed in via SSO has no password at all — by design, "forgot
 > password" deliberately won't work for it either (this stops someone
 > bypassing your identity provider's own security, it isn't a bug). If
 > Google or Microsoft becomes unreachable, or someone's access there is
 > revoked, another instance admin can still get them back in from
 > **Admin → Users → Reset Password**, which sets a real password for
-> them regardless of SSO state. That path only requires some working
+> them regardless of SSO state. That path only requires **some** working
 > admin account, though — if every instance admin is SSO-only and your
 > identity provider is down, recovery needs direct server access instead
 > of the UI. Keep at least one admin account with a real password as a
-> safety net.*
+> safety net._

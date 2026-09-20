@@ -128,13 +128,12 @@ password on first login.
 Visit that URL and log in — you'll be asked to set a new password
 immediately.
 
-:::note[A note on TLS]
-The `proxy` container only ever serves plain HTTP on `PROXY_PORT` — its
-config is baked into the image, with nothing to edit. Terminating TLS
-needs a separate reverse proxy or load balancer in front of it; see
-[Configuration](/getting-started/configuration/#tls) for a concrete
-setup. Do this before pointing real users at the instance.
-:::
+> **A note on TLS:** _the `proxy` container only ever serves plain HTTP
+> on `PROXY_PORT` — its config is baked into the image, with nothing to
+> edit. Terminating TLS needs a separate reverse proxy or load balancer
+> in front of it; see [Configuration](/getting-started/configuration/#tls)
+> for a concrete setup. Do this before pointing real users at the
+> instance._
 
 ## What's next
 

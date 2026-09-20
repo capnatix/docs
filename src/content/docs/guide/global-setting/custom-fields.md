@@ -11,12 +11,12 @@ available everywhere a company shows up, from Sourcing through Portfolio.
 
 Configure it at **Admin → Master Configuration → Custom Fields**.
 
-> *There's a similarly-named but unrelated feature — **Settings → Asset
+> _There's a similarly-named but unrelated feature — **Settings → Asset
 > Types**' "custom columns" — that lets a fund add extra text/number/date
 > columns to its own transaction tables, scoped to one asset type
 > (Equity, Debt, Gold) in that one fund, purely for data capture and
 > never used in any calculation. That's a completely different system
-> from this page.*
+> from this page._
 
 ## What's in it
 

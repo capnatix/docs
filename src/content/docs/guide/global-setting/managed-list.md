@@ -73,10 +73,10 @@ fund entirely, via the quick-add option where these fields appear
 in-context (not from this page). Treat any of those roles, on any single
 fund, as enough to reach every category here — because it is.
 
-> ***Investor Status*** *exists as a category here, and the page's own
+> _**Investor Status** exists as a category here, and the page's own
 > copy says changes apply immediately everywhere that list is used — but
 > the actual investor status dropdown is hardcoded elsewhere in the app
 > and never reads from this list at all. Editing it here has no visible
 > effect anywhere. This is a real gap in the product, not a
-> documentation nuance — a known issue, not something to work around
-> here.*
+> documentation nuance — tracked separately, not something to work
+> around here._
