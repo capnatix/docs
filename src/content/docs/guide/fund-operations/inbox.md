@@ -32,14 +32,14 @@ reject here, since there's no submission yet.
 ## Accepting a submission
 
 Accepting creates the deal and asks you to choose which Sourcing stage
-it starts in — defaulting to the first by sequence, but always your
-explicit choice, and restricted to Sourcing stages only. You can't
-accept a submission directly into Dealflow or Portfolio.
+it starts in, pre-filled with the first stage by sequence — the normal
+flow restricts you to Sourcing stages and lets you click Accept without
+touching the dropdown at all, taking that default.
 
 Sending the applicant an acceptance email is your choice each time —
-send now, hold for later, or schedule it — never automatic, though
-whether that choice defaults toward sending or holding is itself set at
-the fund level.
+send now, hold for later, or schedule it — never automatic. It starts
+out set to hold, every time, regardless of anything about the fund;
+there's no setting that changes that starting point.
 
 ## Rejecting a submission
 
@@ -50,8 +50,14 @@ each time, not automatic.
 
 ## Who can do what
 
-Reaching the Inbox at all takes two things together: an editor-level
-fund role (view-only isn't enough) and the Inbox itself being included
-in your instance's license plan. If the plan doesn't include it, the
-whole area is blocked server-side regardless of role, and the nav item
-won't even show.
+Reaching the Inbox through the product takes two things together: an
+editor-level fund role (view-only isn't enough) and the Inbox itself
+being included in your instance's license plan — without both, the nav
+item won't show and accepting or rejecting is rejected server-side.
+
+> *Reading the raw list of submissions and drafts is looser than the
+> rest of the page: those two endpoints only require being signed in,
+> with no fund-role or license check behind them specifically. Treat
+> that as an internal implementation detail rather than something to
+> rely on — the intent is clearly editor-and-licensed-only, matching
+> everything else here.*

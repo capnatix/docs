@@ -35,15 +35,14 @@ The two pages don't default to the same view: Sourcing opens as a plain
 list; Dealflow opens as a kanban board. Either page lets you switch, and
 your choice is remembered separately per page.
 
-> *The list views aren't actually the same set of columns, despite
-> looking like they should be. Sourcing's list (shared with Watchlist
-> and Archive) shows 13 columns — industry, sector, labels, source
-> type, which application form a deal came from, deal partner and
-> manager, both valuation fields, and more. Dealflow's list view is a
-> separate, much thinner table with only 6: trade name, registered
-> name, sector, date added, stage, portfolio manager. If a field you
-> rely on in Sourcing's list disappears when you switch to Dealflow,
-> that's this gap — not something you're missing in the UI.*
+> *The list views aren't actually the same set of columns today,
+> despite looking like they should be — Sourcing's list (shared with
+> Watchlist and Archive) shows quite a few more fields than Dealflow's
+> does, things like industry, source type, which application form a
+> deal came from, and both valuation fields. This is a known,
+> unintentional gap rather than a design choice, and is expected to
+> close; if a field you rely on in Sourcing's list disappears when you
+> switch to Dealflow, that's why.*
 
 ## Permission notes worth knowing
 
@@ -51,12 +50,14 @@ your choice is remembered separately per page.
 > the permission that actually governs whether you're allowed to add
 > one in that specific bucket is checked separately, only once you
 > submit — it's possible to see and click the button and still be
-> rejected.*
+> rejected. This is a known gap between what the button shows and what
+> it's allowed to do, not intended behavior to plan around.*
 
 > *Moving a deal between stages is checked against the bucket it's
 > currently in, not the one you're moving it into. In practice, edit
 > rights in Sourcing are enough to drag a deal all the way into
-> Dealflow, even without a separate Dealflow edit grant.*
+> Dealflow, even without a separate Dealflow edit grant — also a known
+> gap, expected to be closed by checking the destination bucket too.*
 
 ## Who can do what
 
