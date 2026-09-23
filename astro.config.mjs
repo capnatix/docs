@@ -88,6 +88,7 @@ export default defineConfig({
             {
               label: 'Fund Operations',
               items: [
+                { label: 'Inbox', link: '/guide/fund-operations/inbox/' },
                 {
                   label: 'Deal Sourcing',
                   link: '/guide/fund-operations/deal-sourcing/',
