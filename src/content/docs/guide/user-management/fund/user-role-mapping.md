@@ -35,12 +35,15 @@ what you've typed is a valid email that matches nobody does a separate
 "Invite — creates a new Pending account" option appear, visually distinct
 from a normal match.
 
-> _Inviting a brand-new email creates their account as Pending, and the
-> page tells you so directly: "Pending users can't log in until an admin
-> resets their password via Admin → Users." There's no resend or
-> status-check action here — once you've sent the invite, this page has
-> nothing more to offer; finishing activation means leaving it entirely
-> for the separate Admin → Users screen._
+> *Inviting a brand-new email creates their account as Pending, and the
+> page tells you so directly — though its own wording is misleading:
+> "Pending users can't log in until an admin resets their password via
+> Admin → Users." Resetting their password alone doesn't fix anything;
+> what actually activates them is a separate action on that same
+> screen, flipping their status from Inactive to Active. There's no
+> resend or status-check action here — once you've sent the invite,
+> finishing activation means leaving this page entirely for Admin →
+> Users.*
 
 ## Removing someone
 
@@ -50,12 +53,12 @@ It's a hard delete from this fund's membership, not something you can
 undo by anything short of re-adding them, and re-adding starts fresh
 with no memory of their old role template.
 
-> _Removing someone from a fund only ends their access to it — it
+> *Removing someone from a fund only ends their access to it — it
 > doesn't touch anything that already names them elsewhere, like being
 > listed as a deal's Partner or Portfolio Manager. That assignment
 > stays exactly as it was, now silently pointing at someone who can no
 > longer open the deal, with nothing on this page to tell you it
-> happened._
+> happened.*
 
 ## Permission overrides you can't see
 
@@ -72,7 +75,7 @@ actually do.
 
 ## Who can do what
 
-> _This page hides itself entirely from anyone without the global
+> *This page hides itself entirely from anyone without the global
 > instance-admin flag — regardless of what fund-level permission they
 > hold. The permission node that actually gates writing to fund
 > membership is fund-scoped, and the seeded Fund Admin template grants
@@ -80,7 +83,7 @@ actually do.
 > itself never lets a non-instance-admin see it in the first place. A
 > Fund Admin delegated the ability to manage their own fund's members,
 > the way the permission system is designed to allow, can't actually do
-> so through the product today._
+> so through the product today.*
 
 Reading the member list, separately, has no dedicated permission check
 at all beyond ordinary fund membership — any member of the fund, holding
