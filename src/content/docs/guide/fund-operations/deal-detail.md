@@ -19,11 +19,12 @@ once.
 ## The sections
 
 - **Profile** — the page you land on, itself split into sub-tabs:
-  Profile (the core company fields), Deal (deal economics and your
-  fund's own deal-team assignment), Team (company contacts — founders,
-  executives, not your fund's team, despite the name), Custom Fields
-  (shown only if the company has any), and Form Data (shown only if this
-  deal came from an application).
+  - **Profile** — the core company fields.
+  - **Deal** — deal economics and your fund's own deal-team assignment.
+  - **Team** — company contacts, founders and executives — not your
+    fund's own team, despite the name.
+  - **Custom Fields** — shown only if the company has any.
+  - **Form Data** — shown only if this deal came from an application.
 - **Discussions** — a threaded comment/reply thread on the deal.
 - **Emails** — a read-only log of email activity tied to this deal, with
   delete.
