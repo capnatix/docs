@@ -10,11 +10,12 @@ aren't quite what their labels suggest, so it's worth reading through
 once.
 
 > *There's no single "edit mode" for a deal, despite an `/edit` URL
-> existing. Almost everything — Profile, Deal, Team, Custom Fields, Form
-> Data — is editable right on the ordinary page you land on, with no
-> lock and no separate step. The one exception is Transactions, which
-> has its own dedicated edit page behind an actual lock, a more careful
-> model reserved just for cap-table data (see below).*
+> existing. Profile, Deal, Team, Custom Fields, Form Data, and
+> Investors are all editable right on the ordinary page you land on,
+> with no lock and no separate step — the `/edit` URL's own Profile and
+> Investors links just take you straight back there. The one section
+> actually edited on `/edit` is Transactions, behind a real lock (see
+> below).*
 
 ## The sections
 
@@ -26,8 +27,10 @@ once.
   - **Custom Fields** — shown only if the company has any.
   - **Form Data** — shown only if this deal came from an application.
 - **Discussions** — a threaded comment/reply thread on the deal.
-- **Emails** — a read-only log of email activity tied to this deal, with
-  delete.
+- **Emails** — a log of email activity tied to this deal. Mostly
+  read-only (with delete), but replying from here is its own separate
+  permission — someone with that grant can send outbound email as the
+  fund, straight from a deal's thread.
 - **Drive** — file storage for the deal: upload, share, version
   history. Download links expire after five minutes.
 - **Investors** — cap-table participant records.
@@ -37,9 +40,11 @@ once.
 
 > *Investors and Transactions aren't just empty for a deal that's still
 > in Sourcing, still only in Dealflow, or sitting in Watchlist — they're
-> hidden from the rail entirely. Those sections only appear once a deal
-> has an actual investment behind it, so don't go looking for them on a
-> deal that hasn't reached that point yet.*
+> hidden from the rail entirely. Whether they show up is decided purely
+> by which bucket the deal is currently in (Portfolio makes them
+> appear), not by whether any investment has actually been recorded
+> yet — a deal freshly moved into Portfolio with nothing entered will
+> still show both sections, just empty.*
 
 ## Editing the core fields
 
@@ -79,16 +84,17 @@ fund, described on the [Trash](/guide/global-setting/trash/) page.
 
 ## Who can do what
 
-> *Viewing this page checks less than you'd expect: being signed in,
-> having the fund in your fund list, and the relevant module being on
-> your license plan — there's no separate view permission per section.
-> Editing checks more than the interface shows: each section has its
-> own permission (Profile/Deal/Team/Custom Fields/Form Data all share
-> one; Transactions, Discussions, and Drive each have their own),
-> checked per pipeline bucket the deal happens to be in right now — but
-> the page itself only ever asks one coarse question up front, whether
+> *Every section here is its own permission, checked per pipeline
+> bucket the deal is currently in — Profile/Deal/Team/Custom
+> Fields/Form Data share one node between them, and Transactions,
+> Investors, Discussions, Emails, and Drive each have their own,
+> independent of the others. Reading a section you don't have access to
+> is rejected as soon as that section tries to load its data — you'll
+> see it fail to load, not silently show wrong data. Editing is looser:
+> the page itself only asks one coarse question up front, whether
 > you're a fund editor at all, before letting you into every section's
-> interface. If your role template denies you a specific section,
-> nothing says so ahead of time; you find out when you try to save and
-> it's rejected. That's deliberate, not a bug — worth knowing so an
-> unexpected rejection doesn't feel like a broken page.*
+> edit interface. If your role template then denies you write access to
+> the specific section you're in, nothing says so ahead of time — you
+> find out when you try to save and it's rejected. That asymmetry is
+> called out directly in the app's own code comments as intentional,
+> not an oversight.*

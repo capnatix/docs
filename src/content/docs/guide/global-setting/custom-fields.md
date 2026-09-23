@@ -36,10 +36,13 @@ deleting field definitions only happens here, instance-wide.
 
 Fully wired: the Custom Fields tab on a company's **edit** page (there's
 no read-only rendering of custom fields on the plain detail/view page —
-you need edit access to see them at all), the [Application
-Form](/guide/fund-configuration/application-form/) designer (so a
-custom field can be collected at the point a deal comes in, reviewed on
-the [Inbox](/guide/fund-operations/inbox/) page), and kanban deal cards
+you need edit access to see them at all; see
+[Deal Detail](/guide/fund-operations/deal-detail/) for the rest of that
+page), the fund's own application-form designer (so a custom field can
+be collected at the point a deal comes in — not yet its own page on
+this docs site, under Fund Configuration; reviewing what's submitted
+happens separately on the [Inbox](/guide/fund-operations/inbox/) page),
+and kanban deal cards
 — including as a numeric aggregate metric if
 the field is a number.
 

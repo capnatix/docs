@@ -36,17 +36,19 @@ it starts in, pre-filled with the first stage by sequence — the normal
 flow restricts you to Sourcing stages and lets you click Accept without
 touching the dropdown at all, taking that default.
 
-Sending the applicant an acceptance email is your choice each time —
-send now, hold for later, or schedule it — never automatic. It starts
-out set to hold, every time, regardless of anything about the fund;
-there's no setting that changes that starting point.
+Whether you get a choice about the acceptance email at all depends on a
+fund-level setting. Normally you do — send now, hold for later, or
+schedule it, defaulting to hold every time. But a fund can switch
+acceptance (and rejection) emails to send automatically instead; when
+that's on, there's no choice to make here at all — it just goes out.
 
 ## Rejecting a submission
 
 Rejecting doesn't delete anything. The submission stays, just marked
 Rejected, with an optional reason you can attach. No deal is ever
-created for it. Like accepting, notifying the applicant is your choice
-each time, not automatic.
+created for it. Notifying the applicant works the same way as accepting
+— your choice each time, unless the fund has switched rejection emails
+to send automatically.
 
 ## Who can do what
 
