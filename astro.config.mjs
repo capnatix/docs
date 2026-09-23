@@ -93,6 +93,7 @@ export default defineConfig({
                   label: 'Deal Sourcing',
                   link: '/guide/fund-operations/deal-sourcing/',
                 },
+                { label: 'Deal Detail', link: '/guide/fund-operations/deal-detail/' },
                 { label: 'Portfolio', link: '/guide/fund-operations/portfolio/' },
                 { label: 'IC Meetings', link: '/guide/fund-operations/ic-meetings/' },
                 {

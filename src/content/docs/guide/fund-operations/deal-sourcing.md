@@ -14,9 +14,12 @@ Navigate to either from the fund's own sidebar — **Sourcing** and
 
 > *This page doesn't cover how a deal first arrives — that's the
 > [Inbox](/guide/fund-operations/inbox/), where public application-form
-> submissions are reviewed before becoming a deal — or how the
-> application form itself is built, which is a separate concern under
-> Fund Configuration.*
+> submissions are reviewed before becoming a deal — or what's inside a
+> deal once you click into it, covered on its own on
+> [Deal Detail](/guide/fund-operations/deal-detail/) since that page is
+> identical whether the deal is in Sourcing, Dealflow, or Portfolio —
+> or how the application form itself is built, which is a separate
+> concern under Fund Configuration.*
 
 ## What's the same
 
