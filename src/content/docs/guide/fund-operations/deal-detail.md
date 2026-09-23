@@ -44,11 +44,12 @@ once.
 
 > *Investors and Transactions aren't just empty for a deal that's still
 > in Sourcing, still only in Dealflow, or sitting in Watchlist — they're
-> hidden from the rail entirely. Whether they show up is decided purely
-> by which bucket the deal is currently in (Portfolio makes them
-> appear), not by whether any investment has actually been recorded
-> yet — a deal freshly moved into Portfolio with nothing entered will
-> still show both sections, just empty.*
+> hidden from the rail entirely. They reappear for Portfolio and for
+> Archive alike (a deal that had investments before being archived keeps
+> showing them), and whether they show up is decided purely by that
+> bucket check, not by whether any investment has actually been
+> recorded yet — a deal freshly moved into Portfolio with nothing
+> entered will still show both sections, just empty.*
 
 ## Editing the core fields
 
@@ -88,8 +89,10 @@ instead of duplicating it.
 Replying from the Emails tab sends a genuine email, not a Capnatix-only
 comment — properly threaded so it lands in the recipient's own inbox as
 a real reply to the right message, not a new one. You choose how it
-goes out: through your fund's own configured sender, or through your
-own connected Google or Microsoft account.
+goes out: through the instance's own configured sender (the same one
+every fund on this instance shares, set up on
+[SMTP](/guide/instance-configuration/smtp/)), or through your own
+connected Google or Microsoft account.
 
 > *Not every tagged email can be replied to. Threading depends on
 > details only captured when a mailbox was connected at tagging time —
