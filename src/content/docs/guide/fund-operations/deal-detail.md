@@ -36,8 +36,7 @@ once.
   tagging and replying actually work.
 - **Drive** — file storage for the deal: upload, share, version
   history. Download links expire after five minutes.
-- **Investors** — cap-table participant records: who invested, and how
-  much.
+- **Investors** — who invested in this deal, and how much.
 - **Transactions** — where investment rounds get created, and where
   each investor's stake in this specific deal is tracked round by
   round. Read-only here; see below for where it's actually edited.
@@ -100,7 +99,7 @@ own connected Google or Microsoft account.
 > and viewing — off by default for every role except Fund Admin, so
 > don't assume everyone who can see this tab can send from it.*
 
-## Editing the cap table
+## Editing rounds and transactions
 
 Transactions is the one section with real editing machinery. Clicking
 Edit takes you to a dedicated page behind a pessimistic lock — while
