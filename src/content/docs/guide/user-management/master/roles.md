@@ -50,10 +50,9 @@ Admin's permissions immutable, only undeletable (below).
 
 A member can also be given a one-off permission override that replaces
 their template's grants entirely for that one person — that override, if
-one exists, isn't visible or editable from this page at all. It isn't
-manageable anywhere else in the product either; see
+one exists, isn't visible or editable from this page at all. See
 [User Role Mapping](/guide/user-management/fund/user-role-mapping/) for
-the full picture on why.
+the full picture on where it can (and can't) actually be managed.
 
 ## Removing a template
 
