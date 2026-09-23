@@ -31,19 +31,25 @@ Capnatix account and inviting a brand-new email, and the UI makes clear
 which one you're doing. Pick a role template first, then search: if what
 you type matches an existing account, clicking it adds them to the fund
 immediately with no email sent and no new account created. Only when
-what you've typed is a valid email that matches nobody does a separate
-"Invite — creates a new Pending account" option appear, visually distinct
-from a normal match.
+what you've typed is a valid email that matches no addable account does
+a separate "Invite — creates a new Pending account" option appear,
+visually distinct from a normal match.
 
-> *Inviting a brand-new email creates their account as Pending, and the
-> page tells you so directly — though its own wording is misleading:
-> "Pending users can't log in until an admin resets their password via
-> Admin → Users." Resetting their password alone doesn't fix anything;
-> what actually activates them is a separate action on that same
-> screen, flipping their status from Inactive to Active. There's no
-> resend or status-check action here — once you've sent the invite,
-> finishing activation means leaving this page entirely for Admin →
-> Users.*
+> *An instance admin's email counts as "matches nobody" here too, since
+> admins never appear in the addable-account list — so typing one shows
+> the same Invite option a genuinely new email would. Clicking it doesn't
+> work, though: it's rejected with "Admins have global access — no need
+> to assign," a dead end the UI gives no hint of beforehand.*
+
+Inviting a brand-new email creates their account as Pending, and the
+page tells you so directly — though its own wording points at the wrong
+fix: "Pending users can't log in until an admin resets their password
+via Admin → Users." Resetting their password alone doesn't activate
+them; what actually does is a separate action on that same screen,
+covered on the [Users](/guide/user-management/master/users/) page,
+flipping their status from Inactive to Active. There's no resend or
+status-check action here — once you've sent the invite, finishing
+activation means leaving this page entirely.
 
 ## Removing someone
 
@@ -62,25 +68,24 @@ with no memory of their old role template.
 
 ## Permission overrides you can't see
 
-A member's role template isn't the only thing that can shape their
-access — there's also a per-member override that can replace a
-template's grants entirely for one person. It exists at the data layer
-and this page's own API can technically set one, but nothing in the
-product's interface, on this page or anywhere else, ever actually sends
-one. In practice it's unreachable outside a direct API call. Worse,
-there's no way to tell from this page whether a given row is even
-affected by one — the information is fetched but never shown, so the
-dropdown you see may not tell the whole story of what that person can
-actually do.
+The per-member permission override mentioned on
+[Fund Roles](/guide/user-management/master/roles/) is, technically,
+this page's own API to set — but nothing in the product's interface
+ever actually sends one, on this page or anywhere else, so in practice
+it's reachable only via a direct API call. This page makes that harder
+to notice, not easier: it fetches whether a given member has one but
+never shows it, so the role-template dropdown you see may not tell the
+whole story of what that person can actually do.
 
 ## Who can do what
 
-> *This page hides itself entirely from anyone without the global
-> instance-admin flag — regardless of what fund-level permission they
-> hold. The permission node that actually gates writing to fund
-> membership is fund-scoped, and the seeded Fund Admin template grants
-> it — but that only matters for a direct API call, since the page
-> itself never lets a non-instance-admin see it in the first place. A
+> *The "Users" link in fund settings shows for everyone, but opening it
+> blocks anyone without the global instance-admin flag with a plain
+> "Admin access required" message — regardless of what fund-level
+> permission they hold. The permission node that actually gates writing
+> to fund membership is fund-scoped, and the seeded Fund Admin template
+> grants it — but that only matters for a direct API call, since this
+> page's content stays blocked for a non-instance-admin either way. A
 > Fund Admin delegated the ability to manage their own fund's members,
 > the way the permission system is designed to allow, can't actually do
 > so through the product today.*
